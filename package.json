@@ -24,7 +24,7 @@
     "aws-cdk-lib": "^2.277.0",
     "constructs": "^10.0.0",
     "hono": "^4.13.19",
-    "hono-verified-permissions": "https://github.com/yuu551/hono-verified-permissions/releases/download/v0.1.0/hono-verified-permissions-0.1.0.tgz"
+    "hono-verified-permissions": "0.1.0"
   },
   "devDependencies": {
     "@cedar-policy/cedar-wasm": "^4.15.0",
