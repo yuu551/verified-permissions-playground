@@ -4,96 +4,91 @@ const local = config.mode !== 'aws'
 const repo = 'https://github.com/yuu551/verified-permissions-playground/blob/main/'
 const labels = {
   en: {
-    title: 'Document access lab',
-    intro: 'Choose a document, send a request, and see what the Cedar policies allow.',
-    request: 'Request',
+    title: 'Policy playground',
+    documents: 'Documents',
+    connection: 'Connection',
+    runtime: 'Runtime',
     response: 'Response',
-    document: 'Document',
     guide: 'Team guide',
     release: 'Release draft',
     notes: 'Personal notes',
     backend: 'Backend',
     identity: 'Identity',
     send: 'Send request',
-    source: 'View implementation ↗',
+    source: 'Route source',
     policies: 'Cedar policies',
+    deploy: 'Deploy with CDK',
     signin: 'Sign in',
     signout: 'Sign out',
     username: 'Username',
     password: 'Password',
     accountHelp: 'Use the reader created with npm run demo:user.',
-    browser: 'Browser Cedar',
-    browserNote:
-      'This demo runs Hono and Cedar in your browser. Deploy the CDK sample to compare Hono and FastAPI on AWS.',
-    preview: 'Local Cedar',
-    aws: 'AWS · REST API',
+    browser: 'In browser',
+    preview: 'Local server',
+    aws: 'AWS REST API',
+    browserNote: 'Hono and Cedar run in this browser. The CDK example also includes FastAPI.',
+    localNote: 'Hono and Cedar run on the local server. The CDK example also includes FastAPI.',
+    awsNote: 'API Gateway checks the Cognito ID token. Both backends use the same policy store.',
     reader: 'Demo reader',
     guest: 'Anonymous',
     signed: 'Signed-in reader',
-    pending: 'Ready to evaluate',
-    hint: 'Send a request to see the HTTP response.',
+    pending: 'No response yet',
     allowed: 'Allowed',
     denied: 'Forbidden',
     unauthorized: 'Unauthenticated',
     unknown: 'Request failed',
-    loading: 'Evaluating…',
-    permit: 'The read policy permits this document.',
-    forbid: 'The embargo policy forbids the release draft, even with a matching permit.',
-    implicit: 'No policy permits access to personal notes.',
-    noauth: 'The request needs a reader identity.',
-    failure: 'The service could not complete this request.',
-    localNote:
-      'Local mode uses the Hono route and the Cedar engine on your computer. Deploy to compare both backends with Verified Permissions.',
-    awsNote:
-      'Both backends use this policy store. API Gateway verifies the Cognito ID token before invoking either backend.',
+    loading: 'Sending…',
+    permit: 'The sample permits a reader to open this document.',
+    forbid: 'Both files apply to the release draft. The embargo overrides the permit.',
+    implicit: 'Neither file grants access to personal notes.',
+    noauth: 'Send a reader identity to access this route.',
+    failure: 'The request could not be completed.',
     invalid: 'Sign-in failed. Check the reader credentials and try again.',
-    required: 'Sign in first or choose Anonymous.',
   },
   ja: {
     title: '文書のアクセス権を試す',
-    intro: '文書を選んでリクエストを送り、Cedar ポリシーによる許可・拒否を確認できます。',
-    request: 'リクエスト',
-    response: 'レスポンス',
-    document: '文書',
+    documents: '文書',
+    connection: '接続設定',
+    runtime: '実行環境',
+    response: '応答',
     guide: 'チームガイド',
     release: 'リリース草稿',
     notes: '個人メモ',
     backend: 'バックエンド',
     identity: 'ユーザー',
     send: 'リクエストを送る',
-    source: '実装を見る ↗',
+    source: 'ルートの実装',
     policies: 'Cedar ポリシー',
+    deploy: 'CDK でデプロイ',
     signin: 'サインイン',
     signout: 'サインアウト',
     username: 'ユーザー名',
     password: 'パスワード',
-    accountHelp: 'npm run demo:user で作成したユーザーでサインインしてください。',
-    browser: 'ブラウザー Cedar',
+    accountHelp: 'npm run demo:user で作成したユーザーを使ってください。',
+    browser: 'ブラウザー',
+    preview: 'ローカルサーバー',
+    aws: 'AWS REST API',
     browserNote:
-      'このデモはブラウザー内で Hono と Cedar を実行します。CDK でデプロイすると Hono と FastAPI を AWS で比較できます。',
-    preview: 'ローカル Cedar',
-    aws: 'AWS · REST API',
+      'この画面ではブラウザー内で Hono と Cedar を実行します。CDK のサンプルでは FastAPI も試せます。',
+    localNote:
+      'Hono と Cedar はローカルサーバーで動いています。CDK のサンプルでは FastAPI も試せます。',
+    awsNote:
+      'API Gateway が Cognito の ID トークンを検証します。どちらのバックエンドも同じポリシーストアを使います。',
     reader: 'デモユーザー',
     guest: '匿名',
     signed: '認証済みユーザー',
-    pending: '判定待ち',
-    hint: 'リクエストを送ると HTTP の応答が表示されます。',
+    pending: '未送信',
     allowed: '閲覧を許可',
     denied: '閲覧を拒否',
     unauthorized: '未認証',
     unknown: 'リクエスト失敗',
-    loading: '判定中…',
-    permit: '閲覧ポリシーがこの文書を許可しました。',
-    forbid: '閲覧を許可するポリシーもありますが、草稿には明示的な禁止が適用されます。',
+    loading: '送信中…',
+    permit: 'この文書は閲覧ポリシーで許可されています。',
+    forbid: '草稿には両方のポリシーが適用されます。明示的な禁止が優先されます。',
     implicit: '個人メモの閲覧を許可するポリシーはありません。',
-    noauth: '閲覧にはユーザーの認証が必要です。',
-    failure: 'サービスから判定を取得できませんでした。',
-    localNote:
-      'ローカルでは Hono と手元の Cedar エンジンを使います。AWS にデプロイすると、両方のバックエンドで Verified Permissions の判定を試せます。',
-    awsNote:
-      '両方のバックエンドで同じポリシーストアを使います。API Gateway は Cognito の ID トークンを検証してからバックエンドを呼び出します。',
+    noauth: 'このルートの閲覧には認証が必要です。',
+    failure: 'リクエストを完了できませんでした。',
     invalid: 'サインインできませんでした。ユーザー名とパスワードを確認してください。',
-    required: 'サインインするか、匿名を選んでください。',
   },
 }
 let language = localStorage.getItem('avp-language') === 'ja' ? 'ja' : 'en'
@@ -109,7 +104,24 @@ function showPolicy(value) {
   policy = value
   for (const name of Object.keys(config.policies))
     $(name).setAttribute('aria-pressed', String(name === value))
-  $('policy-code').textContent = config.policies[value].trim()
+  const code = $('policy-code')
+  code.replaceChildren()
+  for (const part of config.policies[value]
+    .trim()
+    .split(/(\/\/[^\n]*|"(?:[^"\\]|\\.)*"|\b(?:permit|forbid|when|is)\b)/)) {
+    let style
+    if (part.startsWith('//')) style = 'comment'
+    else if (part.startsWith('"')) style = 'literal'
+    else if (['permit', 'forbid', 'when', 'is'].includes(part)) style = 'keyword'
+    if (style) {
+      const token = document.createElement('span')
+      token.className = style
+      token.textContent = part
+      code.append(token)
+    } else {
+      code.append(part)
+    }
+  }
 }
 function renderResult() {
   const status = last?.status
@@ -136,16 +148,13 @@ function renderResult() {
           ? 'noauth'
           : 'failure'
   $('decision').textContent = t(state)
-  $('explanation').textContent = t(explain)
-  $('signal').textContent = {
-    pending: '·',
-    allowed: '✓',
-    denied: '×',
-    unauthorized: '–',
-    unknown: '!',
-  }[state]
-  $('status-code').textContent = status ? 'HTTP ' + status : 'HTTP'
-  $('endpoint').textContent = 'GET /' + route()
+  $('explanation').textContent = last ? t(explain) : ''
+  $('explanation').hidden = !last
+  $('document-title').textContent = t(doc())
+  $('decision').parentElement.dataset.outcome = state
+  $('status-code').textContent = status ? 'HTTP ' + status : ''
+  $('endpoint').textContent = '/' + route()
+  $('payload').hidden = !last
   $('payload').textContent = last ? JSON.stringify(last.body, null, 2) : ''
   $('source').href =
     repo + ($('backend').value === 'fastapi' ? 'api/fastapi/handler.py' : 'api/hono/documents.mjs')
@@ -170,6 +179,7 @@ function render() {
     new Option(t('guest'), 'guest'),
   )
   $('identity').value = identity
+  $('backend').disabled = local
   $('account').hidden = local
   $('login').textContent = t(token ? 'signout' : 'signin')
   $('account-status').textContent = reader
@@ -187,7 +197,7 @@ $('documents').onchange = clearResult
 $('backend').onchange = clearResult
 $('identity').onchange = clearResult
 for (const name of Object.keys(config.policies)) $(name).onclick = () => showPolicy(name)
-$('send').onclick = async () => {
+async function sendRequest() {
   if (!local && $('identity').value === 'reader' && !token) {
     $('dialog').showModal()
     return
@@ -222,6 +232,7 @@ $('send').onclick = async () => {
     }
   }
 }
+$('send').onclick = sendRequest
 $('login').onclick = () => {
   if (token) {
     token = ''
@@ -269,3 +280,4 @@ $('credentials').onsubmit = async (event) => {
   }
 }
 render()
+if (local) sendRequest()

@@ -4,11 +4,11 @@ English · [日本語](./README.ja.md) · [Open the playground](https://yuu551.g
 
 Try a document request, inspect the HTTP response, and read the Cedar policies that explain it. The hosted demo runs Hono and the Cedar WebAssembly engine in your browser. Deploy the same policies to AWS to compare Hono and FastAPI against Amazon Verified Permissions.
 
-[![Document access lab showing a permitted request for the team guide](./docs/playground.png)](https://yuu551.github.io/verified-permissions-playground/)
+[![The document inspector showing the team guide request, its HTTP 200 response and the Cedar source](./docs/playground.png)](https://yuu551.github.io/verified-permissions-playground/)
 
 ## Try three documents
 
-Choose **Demo reader**, select a document and click **Send request**. The **日本語** button switches the interface language.
+Opening the browser demo sends a request for the team guide. Select another document and click **Send request** to compare its HTTP response with the Cedar source below. The **日本語** button switches the interface language.
 
 | Document | Reader | Why |
 | --- | --- | --- |

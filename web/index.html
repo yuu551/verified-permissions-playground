@@ -4,100 +4,93 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <meta name="color-scheme" content="light" />
-    <title>Policy Playground</title>
+    <title>Verified Permissions Playground</title>
     <style>
       /* APP_STYLE */
     </style>
   </head>
   <body>
-    <header>
-      <div class="top">
-        <a class="brand" href="./"
-          ><span class="mark" aria-hidden="true">⌁</span> Policy Playground</a
-        >
-        <div class="top-actions">
-          <span id="mode"></span><button id="language" type="button">日本語</button>
-        </div>
+    <header class="masthead">
+      <div class="frame masthead-inner">
+        <h1 data-i="title">Policy playground</h1>
+        <nav aria-label="Project">
+          <a href="https://github.com/yuu551/verified-permissions-playground">GitHub</a>
+          <button id="language" type="button">日本語</button>
+        </nav>
       </div>
     </header>
-    <main>
-      <div class="intro">
-        <p class="eyebrow">AMAZON VERIFIED PERMISSIONS</p>
-        <h1 data-i="title">Document access lab</h1>
-        <p data-i="intro">
-          Choose a document, send a request, and see what the Cedar policies allow.
-        </p>
-      </div>
-      <div class="bench">
-        <section class="request">
-          <div class="section-label"><span data-i="request">Request</span><code>GET</code></div>
-          <h2 data-i="document">Document</h2>
-          <fieldset id="documents">
-            <legend class="sr" data-i="document">Document</legend>
-            <label
-              ><input type="radio" name="doc" value="guide" checked /><span
-                ><b data-i="guide">Team guide</b><small>guide</small></span
-              ></label
-            >
-            <label
-              ><input type="radio" name="doc" value="release" /><span
-                ><b data-i="release">Release draft</b><small>release</small></span
-              ></label
-            >
-            <label
-              ><input type="radio" name="doc" value="notes" /><span
-                ><b data-i="notes">Personal notes</b><small>notes</small></span
-              ></label
-            >
-          </fieldset>
-          <div class="settings">
-            <div>
-              <label for="backend" data-i="backend">Backend</label
-              ><select id="backend"></select>
-            </div>
-            <div>
-              <label for="identity" data-i="identity">Identity</label
-              ><select id="identity"></select>
-            </div>
-          </div>
+    <main class="frame workbench">
+      <aside class="rail">
+        <fieldset id="documents">
+          <legend data-i="documents">Documents</legend>
+          <label
+            ><input type="radio" name="doc" value="guide" checked /><span data-i="guide"
+              >Team guide</span
+            ></label
+          >
+          <label
+            ><input type="radio" name="doc" value="release" /><span data-i="release"
+              >Release draft</span
+            ></label
+          >
+          <label
+            ><input type="radio" name="doc" value="notes" /><span data-i="notes"
+              >Personal notes</span
+            ></label
+          >
+        </fieldset>
+        <section class="connection">
+          <h2 data-i="connection">Connection</h2>
+          <label for="backend" data-i="backend">Backend</label>
+          <select id="backend"></select>
+          <label for="identity" data-i="identity">Identity</label>
+          <select id="identity"></select>
           <div id="account" hidden>
-            <button class="subtle" id="login" type="button" data-i="signin">Sign in</button
-            ><span id="account-status"></span>
+            <button id="login" type="button" data-i="signin">Sign in</button>
+            <span id="account-status"></span>
           </div>
-          <button class="run" id="send" type="button">
-            <span data-i="send">Send request</span><span aria-hidden="true">↗</span>
-          </button>
         </section>
-        <section class="response" aria-live="polite">
-          <div class="section-label">
-            <span data-i="response">Response</span><code id="status-code">HTTP</code>
-          </div>
-          <div class="outcome" id="outcome">
-            <div class="signal" id="signal" aria-hidden="true">·</div>
-            <h2 id="decision"></h2>
+        <div class="runtime"><span data-i="runtime">Runtime</span><strong id="mode"></strong></div>
+      </aside>
+      <article class="inspector" aria-labelledby="document-title">
+        <div class="document-head">
+          <h2 id="document-title">Team guide</h2>
+          <a id="source" data-i="source">Route source</a>
+        </div>
+        <div class="request-line">
+          <code class="method">GET</code><code id="endpoint"></code>
+          <button class="run" id="send" type="button" data-i="send">Send request</button>
+        </div>
+        <section class="exchange" aria-labelledby="response-heading" aria-live="polite">
+          <h3 id="response-heading" data-i="response">Response</h3>
+          <div class="response-content">
+            <div class="status"><code id="status-code"></code><strong id="decision"></strong></div>
             <p id="explanation"></p>
+            <pre id="payload" hidden></pre>
           </div>
-          <div class="response-path"><code id="endpoint"></code></div>
-          <pre id="payload"></pre>
         </section>
-      </div>
-      <section class="policy">
-        <div class="policy-head">
-          <h2 data-i="policies">Cedar policies</h2>
-          <a id="source" target="_blank" rel="noreferrer" data-i="source">View implementation ↗</a>
-        </div>
-        <div class="policy-tabs" role="group" aria-label="Cedar">
-          <button id="published" aria-pressed="true">published.cedar</button
-          ><button id="embargo" aria-pressed="false">embargo.cedar</button>
-        </div>
-        <pre id="policy-code"></pre>
-        <p id="policy-note"></p>
-      </section>
+        <section class="policy" aria-labelledby="policy-heading">
+          <h3 id="policy-heading" data-i="policies">Cedar policies</h3>
+          <div class="policy-tabs" role="group" aria-labelledby="policy-heading">
+            <button id="published" type="button" aria-pressed="true">published.cedar</button>
+            <button id="embargo" type="button" aria-pressed="false">embargo.cedar</button>
+          </div>
+          <pre id="policy-code" tabindex="0"></pre>
+        </section>
+      </article>
     </main>
-    <dialog id="dialog">
+    <footer class="frame">
+      <p id="policy-note"></p>
+      <a
+        href="https://github.com/yuu551/verified-permissions-playground#deploy-with-aws-cdk"
+        data-i="deploy"
+        >Deploy with CDK</a
+      >
+    </footer>
+    <dialog id="dialog" aria-labelledby="dialog-title">
       <form id="credentials">
         <div class="dialog-head">
-          <h2 data-i="signin">Sign in</h2>
+          <h2 id="dialog-title" data-i="signin">Sign in</h2>
           <button id="close" type="button" aria-label="Close">×</button>
         </div>
         <p data-i="accountHelp">Use the reader created with npm run demo:user.</p>

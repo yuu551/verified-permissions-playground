@@ -26,6 +26,11 @@ test.afterAll(async () => {
 
 test('reader, anonymous, explicit forbid and default deny', async ({ page }) => {
   await page.goto('./')
+  if (!cloud) {
+    await expect(page.locator('#status-code')).toHaveText('HTTP 200')
+    await expect(page.locator('#endpoint')).toHaveText('/hono/documents/guide')
+    await expect(page.locator('#payload')).toContainText('"document": "guide"')
+  }
   if (cloud) {
     await page.getByRole('button', { name: 'Sign in', exact: true }).click()
     await page.getByLabel('Username', { exact: true }).fill(reader.username)
@@ -34,7 +39,7 @@ test('reader, anonymous, explicit forbid and default deny', async ({ page }) => 
     await expect(page.getByRole('dialog')).not.toBeVisible()
   }
   for (const backend of cloud ? ['hono', 'fastapi'] : ['hono']) {
-    await page.getByLabel('Backend', { exact: true }).selectOption(backend)
+    if (cloud) await page.getByLabel('Backend', { exact: true }).selectOption(backend)
     for (const [id, status] of [
       ['guide', 200],
       ['release', 403],
