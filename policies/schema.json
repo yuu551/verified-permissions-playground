@@ -1,0 +1,1 @@
+{"Demo":{"entityTypes":{"User":{},"Document":{}},"actions":{"read":{"appliesTo":{"principalTypes":["User"],"resourceTypes":["Document"]}}}}}

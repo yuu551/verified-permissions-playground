@@ -1,0 +1,394 @@
+:root {
+  font:
+    16px/1.5 'Inter',
+    'Hiragino Sans',
+    system-ui,
+    sans-serif;
+  color: #172928;
+  background: #f4f5ee;
+  --ink: #183634;
+  --line: #cad2c6;
+  --lime: #d7f983;
+  --mono: 'IBM Plex Mono', ui-monospace, monospace;
+}
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+}
+button,
+select,
+input {
+  font: inherit;
+}
+button,
+select,
+label:has(input[type='radio']) {
+  cursor: pointer;
+}
+button,
+a,
+input,
+select {
+  outline-offset: 3px;
+}
+:focus-visible {
+  outline: 3px solid #468a96;
+}
+a {
+  color: inherit;
+}
+header {
+  border-bottom: 1px solid var(--line);
+}
+.top,
+main {
+  max-width: 1088px;
+  margin: auto;
+  padding: 0 32px;
+}
+.top,
+.top-actions,
+.section-label,
+.policy-head,
+.dialog-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.top {
+  height: 70px;
+}
+.top-actions {
+  gap: 16px;
+}
+.brand {
+  font-weight: 750;
+  letter-spacing: -0.04em;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.mark {
+  background: var(--ink);
+  color: var(--lime);
+  border-radius: 8px;
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  font: 900 30px/1 var(--mono);
+}
+.top button,
+.subtle,
+.dialog-head button {
+  background: transparent;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 4px 10px;
+  color: var(--ink);
+}
+#mode {
+  font: 12px var(--mono);
+  color: #405e52;
+}
+main {
+  padding-bottom: 50px;
+}
+.intro {
+  margin: 42px 0 29px;
+}
+.eyebrow,
+.section-label {
+  font: 650 11px/1.5 var(--mono);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.eyebrow {
+  color: #486346;
+  margin: 0 0 6px;
+}
+.intro h1 {
+  font-size: clamp(36px, 5.6vw, 64px);
+  letter-spacing: -0.065em;
+  line-height: 1.07;
+  margin: 0;
+}
+.intro > p:last-child,
+.policy p {
+  color: #4e6057;
+}
+.intro > p:last-child {
+  margin: 10px 0 0;
+}
+.bench {
+  display: grid;
+  grid-template-columns: 1fr 1.08fr;
+  border: 1px solid var(--line);
+  border-radius: 15px;
+  overflow: hidden;
+}
+.request,
+.response {
+  padding: 24px;
+}
+.request {
+  background: #fdfff9;
+}
+.section-label {
+  margin-bottom: 18px;
+}
+.section-label code {
+  font: 11px var(--mono);
+  border: 1px solid currentColor;
+  border-radius: 4px;
+  padding: 1px 5px;
+}
+.request h2,
+.settings label {
+  font-size: 14px;
+  margin: 0 0 8px;
+  font-weight: 650;
+}
+.sr {
+  position: absolute;
+  clip: rect(0, 0, 0, 0);
+  height: 1px;
+  width: 1px;
+  overflow: hidden;
+}
+fieldset {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  display: grid;
+  gap: 5px;
+}
+fieldset label {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border: 1px solid #d2d9cf;
+  border-radius: 7px;
+  padding: 9px 12px;
+}
+fieldset label:has(:checked) {
+  background: #eff5e6;
+  border-color: #7a956e;
+}
+input[type='radio'] {
+  accent-color: #386640;
+}
+fieldset label span {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+small {
+  font: 12px var(--mono);
+  color: #506653;
+}
+fieldset b {
+  font-size: 14px;
+}
+.settings {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin: 16px 0;
+}
+.settings label,
+dialog label {
+  display: block;
+}
+.settings select,
+dialog input {
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: #fff;
+  color: var(--ink);
+  padding: 7px 8px;
+}
+.run {
+  width: 100%;
+  padding: 11px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--ink);
+  color: #fff;
+  border: 0;
+  border-radius: 7px;
+  font-weight: 650;
+}
+.run:hover {
+  background: #285146;
+}
+.run:disabled {
+  opacity: 0.6;
+}
+#account {
+  margin: 0 0 12px;
+}
+#account-status {
+  margin-left: 8px;
+  font-size: 13px;
+}
+.response {
+  display: flex;
+  flex-direction: column;
+  color: #f2f6e8;
+  background: #193532;
+}
+.response .section-label {
+  color: #cadbc9;
+}
+.outcome {
+  margin: auto 0;
+  padding: 10px 0 16px;
+}
+.signal {
+  height: 48px;
+  width: 48px;
+  display: grid;
+  place-items: center;
+  color: var(--lime);
+  border: 1px solid #788f79;
+  border-radius: 50%;
+  font-size: 27px;
+}
+.outcome h2 {
+  font-size: clamp(25px, 4vw, 42px);
+  letter-spacing: -0.05em;
+  line-height: 1.12;
+  margin: 10px 0 5px;
+}
+.outcome p {
+  margin: 0;
+  color: #cfddce;
+  font-size: 14px;
+}
+.response-path {
+  border-top: 1px solid #49635a;
+  padding: 12px 0 6px;
+  color: var(--lime);
+  font: 13px var(--mono);
+}
+pre,
+code {
+  font-family: var(--mono);
+}
+pre {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.response pre {
+  margin: 0;
+  font-size: 12px;
+  color: #e0eadb;
+  max-height: 145px;
+  overflow: auto;
+}
+.policy {
+  margin: 24px 0 0;
+  border-top: 1px solid var(--line);
+}
+.policy-head h2,
+.dialog-head h2 {
+  font-size: 23px;
+  letter-spacing: -0.04em;
+}
+.policy-head a {
+  font-size: 13px;
+}
+.policy-tabs {
+  display: flex;
+  gap: 4px;
+}
+.policy-tabs button {
+  font: 12px var(--mono);
+  padding: 6px 12px;
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  background: transparent;
+}
+.policy-tabs button[aria-pressed='true'] {
+  background: var(--ink);
+  color: white;
+}
+.policy pre {
+  border-left: 3px solid #9bb873;
+  padding: 3px 13px;
+  font-size: 13px;
+  margin: 14px 0;
+}
+.policy p {
+  font-size: 14px;
+  margin: 9px 0;
+}
+dialog {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 24px;
+  width: min(420px, 90vw);
+}
+dialog::backdrop {
+  background: #17332c70;
+}
+.dialog-head h2 {
+  margin: 0;
+}
+dialog input {
+  margin: 4px 0 10px;
+}
+dialog p {
+  font-size: 14px;
+}
+#auth-error {
+  color: #872622;
+}
+[hidden] {
+  display: none !important;
+}
+@media (max-width: 700px) {
+  .top,
+  main {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+  .top {
+    height: 58px;
+  }
+  .top-actions {
+    gap: 8px;
+  }
+  .intro {
+    margin: 27px 0 20px;
+  }
+  .bench {
+    grid-template-columns: 1fr;
+  }
+  .request,
+  .response {
+    padding: 18px;
+  }
+  .response {
+    min-height: 255px;
+  }
+  .settings {
+    gap: 8px;
+  }
+  .brand {
+    font-size: 14px;
+  }
+  #mode {
+    font-size: 10px;
+  }
+  .policy-head a {
+    font-size: 12px;
+  }
+}
