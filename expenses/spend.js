@@ -209,6 +209,20 @@ function nav() {
           .join('') +
         '</nav>'
 }
+function demoGuide() {
+  if (!preview) return ''
+  return `<details class="demo-guide">
+    <summary>${t('Try an expense claim from submission to reimbursement', '経費の申請から精算までを試す')}</summary>
+    <p>${t(
+      'As Alice, open “Q4 design workshop” to see why Ben returned it. Attach a sample receipt and submit the report.',
+      'Alice の「Q4 design workshop」には Ben の差し戻し理由が残っています。架空の領収書を添付して「申請する」を押してください。',
+    )}</p>
+    <p>${t(
+      'Use the name at the top right to switch to Ben and approve the report. Then switch to Chika to record a payment reference.',
+      '右上の名前から Ben に切り替えて承認します。次に経理の Chika で精算番号を記録します。',
+    )}</p>
+  </details>`
+}
 function list() {
   const options =
     button('filter', t('All statuses', 'すべての状態'), '', '') +
@@ -219,7 +233,9 @@ function list() {
     word(box) +
     '</h1>' +
     (box === 'mine' ? button('new', t('New report', '申請を作成'), 'primary') : '') +
-    '</div><div class="tools"><input id="search" type="search" aria-label="' +
+    '</div>' +
+    demoGuide() +
+    '<div class="tools"><input id="search" type="search" aria-label="' +
     t('Search reports', '申請を検索') +
     '" placeholder="' +
     t('Search reports', '申請を検索') +

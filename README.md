@@ -2,7 +2,11 @@
 
 [日本語](README.ja.md) · [Open the browser demo](https://yuu551.github.io/verified-permissions-playground/) · [Operations](OPERATIONS.md)
 
-Alice takes the train to a customer visit and submits her fare. Ben reviews the amount and asks for the receipt. Alice attaches it and resubmits. After Ben approves, Chika records the payment reference. All three work on the same report. The app records reimbursements in a ledger. Bank transfers take place outside the sample.
+## Expense reimbursement use case
+
+An employee pays for workshop supplies and claims the cost back. Their manager checks the receipts and can return the report if one is missing. Once the manager approves it, Finance records the payment reference from the bank transfer.
+
+Use this sample to build an approval flow in Hono where access depends on the report as well as the user's role. For example, a manager can approve a teammate's submitted report, while their own expenses need another manager's approval.
 
 ## Try the workflow
 

@@ -263,6 +263,19 @@ small,
 small {
   font-size: 12px;
 }
+.demo-guide {
+  margin: 0 0 20px;
+  color: var(--muted);
+  font-size: 14px;
+}
+.demo-guide summary {
+  width: fit-content;
+  color: var(--accent);
+}
+.demo-guide p {
+  max-width: 66ch;
+  margin: 6px 0;
+}
 .tools {
   margin-bottom: 16px;
   gap: 8px;
