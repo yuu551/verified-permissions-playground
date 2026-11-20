@@ -10,6 +10,8 @@ import { PutCommand } from '@aws-sdk/lib-dynamodb'
 import { config, trialFolder } from './config.mjs'
 import { operator } from './access.mjs'
 import { dataClient } from './store.mjs'
+import { expenseStore } from '../expenses/store.mjs'
+import { sampleReports, profiles } from '../expenses/fixtures.mjs'
 import { people, sampleDocuments } from './fixtures.mjs'
 
 const deployment = config()
@@ -67,6 +69,26 @@ for (const [person, { username, password, marker }] of Object.entries(accounts))
     const { team, role } = people[person]
     await iam.set(username, team, role, 0, 'Initial trial assignment')
   }
+}
+const expenses = expenseStore(db, deployment)
+for (const [person, a] of Object.entries(accounts)) {
+  const m = await iam.show(a.username)
+  if (
+    !m.expenseRole &&
+    m.role === people[person].role &&
+    m.team === people[person].team &&
+    m.revision === 1
+  )
+    await iam.expenseRole(
+      a.username,
+      profiles[person].expenseRole,
+      m.revision,
+      'Initial expense assignment',
+    )
+}
+const employee = await expenses.member(subjects.alice)
+for (const report of sampleReports(subjects)) {
+  if (!(await expenses.report(report.id))) await expenses.save(employee, null, report, randomUUID())
 }
 for (const doc of sampleDocuments(subjects.alice, subjects.chika)) {
   try {

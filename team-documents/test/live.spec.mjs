@@ -16,7 +16,7 @@ test('two signed-in employees hand off a new document', async ({ browser }) => {
     const ctx = await browser.newContext()
     contexts.push(ctx)
     const page = await ctx.newPage()
-    await page.goto(settings.Url)
+    await page.goto(new URL("documents/",settings.Url).href)
     await page.locator('[name=username]').fill(accounts[person].username)
     await page.locator('[name=password]').fill(accounts[person].password)
     await page.locator('#login button').click()

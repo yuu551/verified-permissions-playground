@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test'
 test('publish, switch teams, revoke and trace in the same browser session', async ({ page }) => {
-  await page.goto('./')
+  await page.goto('./documents/')
   const account = async (person) => {
     await page.locator('#person').selectOption(person)
     await page.locator('#enter').click()

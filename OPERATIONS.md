@@ -13,6 +13,20 @@
 
 Use individual federated sessions. The operator role trusts the owning account. Grant `sts:AssumeRole` on its exact output ARN only to approved access operators and restrict the trust before production. The web server cannot assign memberships. The operator can query the roster and audit history and update membership records. The ledger and CloudTrail are separate sources of evidence; the archive is in the same AWS account. Restrict its administrators or use a dedicated archive account for stronger separation.
 
+## Expense approvals
+
+Create an active membership before granting an expense role. Each member can submit expenses. Assign a manager to each team that submits claims and a separate finance user to record reimbursements. A single-manager team needs a second manager to approve its manager’s own claims.
+
+```sh
+npm run access -- show USERNAME
+npm run access -- expense-role USERNAME --role manager --expect REVISION --reason "Design approval rota"
+npm run access -- report-history REPORT_UUID
+```
+
+Use `employee`, `manager` or `finance`. The role and team come from the current membership on every request. A transfer or revocation clears the expense assignment. A former team’s returned draft requires an operator to resolve the business handoff before the employee can submit it again. Use the UUID in the report URL to correlate its latest 50 durable audit entries with CloudWatch request IDs. The report itself shows its most recent 40 activity entries. Seeded examples have a synthetic history and one import transaction. New reports record every business operation.
+
+A receipt is one PDF, JPEG or PNG up to 1.5 MiB. Receipt chunks, report revision and audit record commit together. Replacing a receipt replaces its current copy. A payment reference records an external transfer. Reconcile it externally before recording it here.
+
 ## Onboard, transfer, revoke, review
 
 Start with an authenticated AWS CLI session in the deployed Region. The CLI defaults to the trial's output file. For the persistent stack, export `TEAM_OUTPUTS=cdk-team-outputs.json`. Use an actual Cognito username in place of `USERNAME`. In a new persistent pool, the identity administrator provisions the account and completes its sign-in setup first. A newly provisioned identity has no membership.
@@ -44,7 +58,7 @@ fields @timestamp, @message
 | sort @timestamp desc
 ```
 
-Membership and publication writes commit with their audit event. `history` shows the latest 50 events for the subject; `review` paginates all assigned users on a team. CloudTrail delivers write data events for the two DynamoDB tables to the versioned bucket in `ArchiveOutput`. Correlate the IAM session, timestamp and table with the application ledger. Delivery is asynchronous. Give the archive its own retention and access policy for your organization.
+Membership and publication writes commit with their audit event. `history` shows the latest 50 events for the subject; `review` paginates all assigned users on a team. CloudTrail delivers write data events for the three DynamoDB tables to the versioned bucket in `ArchiveOutput`. Correlate the IAM session, timestamp and table with the application ledger. Delivery is asynchronous. Give the archive its own retention and access policy for your organization.
 
 ### Rehearse loss of the authorization service
 
@@ -52,13 +66,13 @@ In the temporary stack, run `npm run drill:outage` during a coordinated test win
 
 ## Change and roll back a policy
 
-Edit the Cedar files and strict schema in `team-documents/policies/` in a branch. Add an allowed and a denied case to `team-documents/test/access.test.mjs`. Include a cross-team case. Run `npm test`, `npm run synth` and `npx cdk diff` in the correct account. Review the policy change and data protection settings in the diff. Deploy to a trial and run `npm run verify:aws` before approving promotion. Require reviewers in your repository's branch protection or ruleset. For rollback, revert the offending commit and redeploy the reviewed policy. Verified Permissions changes propagate asynchronously; confirm representative outcomes after deployment before closing the incident.
+Edit the Cedar files and strict schema in `expenses/policies/` or `team-documents/policies/` in a branch. Add an allowed and a denied case to `team-documents/test/access.test.mjs`. Include a cross-team case. Run `npm test`, `npm run synth` and `npx cdk diff` in the correct account. Review the policy change and data protection settings in the diff. Deploy to a trial and run `npm run verify:aws` before approving promotion. Require reviewers in your repository's branch protection or ruleset. For rollback, revert the offending commit and redeploy the reviewed policy. Verified Permissions changes propagate asynchronously; confirm representative outcomes after deployment before closing the incident.
 
 ## Recover state
 
-In a seeded trial, run `npm run drill:restore` after its recovery window includes the fixture records. It restores both tables at a common timestamp, checks Ben’s membership against the audit revision, and deletes its temporary copies. The live application continues to serve its original tables.
+In a seeded trial, run `npm run drill:restore` after its recovery window includes the fixture records. It restores all three tables at a common timestamp, checks Ben’s membership, a report, its inbox entry and their audit revisions, and deletes its temporary copies. The live application continues to serve its original tables.
 
-The persistent tables have point-in-time recovery enabled. Stop membership and document writes, record the incident time, and choose a common timestamp before the bad change. Restore **both** tables to new names with `aws dynamodb restore-table-to-point-in-time --source-table-name SOURCE --target-table-name RESTORED --restore-date-time TIMESTAMP`. Wait for both to become active. Check the roster index, sample document ownership, audit revisions and subsequent offboarding events. Reapply any revocations after the restore point before re-opening traffic. Review and deploy a CDK change to use the recovered table ARNs/names and update both runtime and operator IAM permissions. Preserve the original tables during validation. User pools and Cedar policy versions require their own recovery procedures; Git contains the policy definitions. Measure RPO/RTO with a rehearsal in your environment.
+The persistent tables have point-in-time recovery enabled. Pause membership, document and expense writes, record the incident time, and choose a common timestamp before the bad change. Restore all three tables to new names with `aws dynamodb restore-table-to-point-in-time --source-table-name SOURCE --target-table-name RESTORED --restore-date-time TIMESTAMP`. Wait for all three to become active. Check the roster index, sample document ownership, audit revisions and subsequent offboarding events. Reapply any revocations after the restore point before re-opening traffic. Review and deploy a CDK change to use the recovered table ARNs/names and update both runtime and operator IAM permissions. Preserve the original tables during validation. User pools and Cedar policy versions require their own recovery procedures; Git contains the policy definitions. Measure RPO/RTO with a rehearsal in your environment.
 
 ## End a trial
 

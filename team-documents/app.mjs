@@ -6,9 +6,24 @@ import { createAuthorizer, bearerTokenPrincipal } from 'hono-verified-permission
 import { user, document, action, entities } from './model.mjs'
 import { conflict, publish, snapshot, membership, createDraft } from './store.mjs'
 
-export function workspace({ db, config, verifier, engine, page, log = console.log }) {
+export function workspace({
+  db,
+  config,
+  verifier,
+  engine,
+  page,
+  documentPage = page,
+  assets = {},
+  expenses,
+  log = console.log,
+}) {
   const app = new Hono()
   app.get('/', (c) => c.html(page))
+  app.get('/documents', (c) => c.redirect('/documents/'))
+  app.get('/documents/', (c) => c.html(documentPage))
+  for (const [path, { body, type }] of Object.entries(assets))
+    app.get(path, (c) => c.body(body, 200, { 'Content-Type': type }))
+
   app.use('/api/*', async (c, next) => {
     const requestId = randomUUID()
     c.set('requestId', requestId)
@@ -33,6 +48,14 @@ export function workspace({ db, config, verifier, engine, page, log = console.lo
     try {
       const identity = await verifier.verify(token.id)
       c.set('sub', identity.sub)
+      c.set(
+        'displayName',
+        identity.name ||
+          (identity['cognito:username'] ?? '').replace(
+            /^(alice|ben|chika)-[0-9a-f]{8}$/,
+            (_, p) => p[0].toUpperCase() + p.slice(1),
+          ),
+      )
     } catch (error) {
       if (error instanceof FetchError || error instanceof JwksValidationError) throw error
       return c.json({ error: 'Sign in required' }, 401)
@@ -44,6 +67,7 @@ export function workspace({ db, config, verifier, engine, page, log = console.lo
       return c.json({ error: 'Access or document changed. Read the document again.' }, 409)
     return c.json({ error: 'Service unavailable' }, 503)
   })
+  if (expenses) app.route('/api/spend', expenses)
   const route = '/api/documents/:id'
   const authorize = createAuthorizer({ engine, principal: (c) => user(c.var.sub) })
   app.use(route, async (c, next) => {

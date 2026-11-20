@@ -51,6 +51,7 @@ state.addGlobalSecondaryIndex({
   nonKeyAttributes: ['role', 'revision'],
 })
 const audit = table('Audit', 'subject', 'event')
+const reports = table('Reports', 'pk', 'sk')
 const archive = new s3.Bucket(stack, 'TrailArchive', {
   enforceSSL: true,
   versioned: true,
@@ -71,22 +72,36 @@ changes.node.defaultChild.addPropertyOverride('AdvancedEventSelectors', [
     FieldSelectors: [
       { Field: 'eventCategory', Equals: ['Data'] },
       { Field: 'resources.type', Equals: ['AWS::DynamoDB::Table'] },
-      { Field: 'resources.ARN', Equals: [state.tableArn, audit.tableArn] },
+      { Field: 'resources.ARN', Equals: [state.tableArn, audit.tableArn, reports.tableArn] },
       { Field: 'readOnly', Equals: ['false'] },
     ],
   },
 ])
 const read = (file) => readFileSync(new URL('./policies/' + file, import.meta.url), 'utf8')
+const expense = (file) =>
+  readFileSync(new URL('../expenses/policies/' + file, import.meta.url), 'utf8')
 const store = new avp.CfnPolicyStore(stack, 'PolicyStore', {
   validationSettings: { mode: 'STRICT' },
   deletionProtection: { mode: expiry ? 'DISABLED' : 'ENABLED' },
-  schema: { cedarJson: read('schema.json') },
+  schema: {
+    cedarJson: JSON.stringify({
+      ...JSON.parse(read('schema.json')),
+      ...JSON.parse(expense('schema.json')),
+    }),
+  },
 })
 store.applyRemovalPolicy(removalPolicy)
 for (const name of ['boundary', 'read', 'publish']) {
   const policy = new avp.CfnPolicy(stack, name, {
     policyStoreId: store.attrPolicyStoreId,
     definition: { static: { statement: read(name + '.cedar'), description: name } },
+  })
+  policy.applyRemovalPolicy(removalPolicy)
+}
+for (const name of ['owner', 'author', 'manager', 'finance', 'settle']) {
+  const policy = new avp.CfnPolicy(stack, 'Expense' + name, {
+    policyStoreId: store.attrPolicyStoreId,
+    definition: { static: { statement: expense(name + '.cedar'), description: 'Expense ' + name } },
   })
   policy.applyRemovalPolicy(removalPolicy)
 }
@@ -102,6 +117,7 @@ const server = new lambda.WebFunction(stack, 'WorkspaceServer', {
   logGroup: log,
   timeout: Duration.seconds(15),
   environment: {
+    REPORTS_TABLE: reports.tableName,
     STATE_TABLE: state.tableName,
     AUDIT_TABLE: audit.tableName,
     USER_POOL_ID: pool.userPoolId,
@@ -119,7 +135,7 @@ function ddbAccess(actions, target, keys) {
 server.addToRolePolicy(ddbAccess(['GetItem'], state, ['USER#*', 'DOC#*']))
 server.addToRolePolicy(ddbAccess(['ConditionCheckItem'], state, ['USER#*']))
 server.addToRolePolicy(ddbAccess(['PutItem', 'UpdateItem'], state, ['DOC#*']))
-server.addToRolePolicy(ddbAccess(['PutItem'], audit, ['DOC#*']))
+server.addToRolePolicy(ddbAccess(['PutItem'], audit, ['DOC#*', 'REPORT#*']))
 server.addToRolePolicy(
   new iam.PolicyStatement({
     actions: ['verifiedpermissions:IsAuthorized'],
@@ -127,6 +143,15 @@ server.addToRolePolicy(
   }),
 )
 
+server.addToRolePolicy(
+  ddbAccess(['GetItem', 'PutItem', 'DeleteItem', 'Query'], reports, [
+    'REPORT#*',
+    'MINE#*',
+    'REVIEW#*',
+    'FINANCE',
+    'FILE#*',
+  ]),
+)
 const operator = new iam.Role(stack, 'AccessOperator', {
   assumedBy: new iam.AccountPrincipal(Aws.ACCOUNT_ID),
   description:
@@ -140,7 +165,7 @@ operator.addToPolicy(
   }),
 )
 operator.addToPolicy(ddbAccess(['PutItem'], audit, ['USER#*']))
-operator.addToPolicy(ddbAccess(['Query'], audit, ['USER#*', 'DOC#*']))
+operator.addToPolicy(ddbAccess(['Query'], audit, ['USER#*', 'DOC#*', 'REPORT#*']))
 operator.addToPolicy(
   new iam.PolicyStatement({ actions: ['cognito-idp:AdminGetUser'], resources: [pool.userPoolArn] }),
 )
@@ -186,6 +211,7 @@ for (const [key, value] of Object.entries({
   Region: Aws.REGION,
   Pool: pool.userPoolId,
   Client: client.userPoolClientId,
+  Reports: reports.tableName,
   State: state.tableName,
   Audit: audit.tableName,
   Operator: operator.roleArn,

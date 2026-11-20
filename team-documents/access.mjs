@@ -38,7 +38,9 @@ export async function operator(deployment) {
     },
     async set(username, team, role, expected, reason) {
       if (storedSubject.test(username) && (role !== 'none' || expected === 0))
-        throw new Error('Use a current Cognito username for a grant. A stored ID can revoke an existing assignment.')
+        throw new Error(
+          'Use a current Cognito username for a grant. A stored ID can revoke an existing assignment.',
+        )
       return setMembership(
         db,
         deployment,
@@ -52,6 +54,16 @@ export async function operator(deployment) {
     },
     async history(username) {
       return history(db, deployment, 'USER#' + (await subject(username)))
+    },
+    async expenseRole(username, role, expected, reason) {
+      if (storedSubject.test(username)) throw Error('Use a current Cognito username')
+      const sub = await subject(username),
+        m = await membership(db, deployment, sub)
+      if (!m || m.role === 'none') throw Error('Grant active membership first')
+      return setMembership(db, deployment, sub, m.team, m.role, expected, reason, actor, role)
+    },
+    async reportHistory(id) {
+      return history(db, deployment, 'REPORT#' + id)
     },
     async documentHistory(id) {
       return history(db, deployment, 'DOC#' + id)
@@ -72,7 +84,18 @@ if (import.meta.main) {
       reason: { type: 'string' },
     },
   })
-  if (!target || !['show', 'set', 'history', 'review', 'document-history'].includes(command))
+  if (
+    !target ||
+    ![
+      'show',
+      'set',
+      'history',
+      'review',
+      'expense-role',
+      'report-history',
+      'document-history',
+    ].includes(command)
+  )
     throw new Error(
       'Usage: access <show|set|history> USERNAME or access review TEAM or access document-history DOCUMENT',
     )
@@ -80,8 +103,12 @@ if (import.meta.main) {
   const result =
     command === 'set'
       ? await client.set(target, values.team, values.role, Number(values.expect), values.reason)
-      : command === 'document-history'
-        ? await client.documentHistory(target)
-        : await client[command](target)
+      : command === 'expense-role'
+        ? await client.expenseRole(target, values.role, Number(values.expect), values.reason)
+        : command === 'report-history'
+          ? await client.reportHistory(target)
+          : command === 'document-history'
+            ? await client.documentHistory(target)
+            : await client[command](target)
   console.log(JSON.stringify(result, null, 2))
 }

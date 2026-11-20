@@ -120,7 +120,17 @@ export async function membership(db, config, sub) {
   return Item
 }
 
-export async function setMembership(db, config, sub, team, role, expected, reason, actor) {
+export async function setMembership(
+  db,
+  config,
+  sub,
+  team,
+  role,
+  expected,
+  reason,
+  actor,
+  expenseRole,
+) {
   if (
     typeof team !== 'string' ||
     !/^[a-z][a-z0-9-]{0,39}$/.test(team) ||
@@ -132,7 +142,12 @@ export async function setMembership(db, config, sub, team, role, expected, reaso
   const previous = await membership(db, config, sub)
   if ((previous?.revision ?? 0) !== expected)
     throw new Error('Stale revision. Read the membership again.')
+  if (expenseRole && (!['employee', 'manager', 'finance'].includes(expenseRole) || role === 'none'))
+    throw Error('Invalid expense assignment')
+  const assignment =
+    expenseRole ?? (team === previous?.team && role !== 'none' ? previous?.expenseRole : undefined)
   const next = {
+    ...(assignment && { expenseRole: assignment }),
     pk: 'USER#' + sub,
     revision: expected + 1,
     team,
@@ -158,8 +173,14 @@ export async function setMembership(db, config, sub, team, role, expected, reaso
           operation: 'membership',
           actor,
           reason: reason.trim(),
-          before: previous ? { team: previous.team, role: previous.role } : null,
-          after: { team, role },
+          before: previous
+            ? {
+                team: previous.team,
+                role: previous.role,
+                ...(previous.expenseRole && { expenseRole: previous.expenseRole }),
+              }
+            : null,
+          after: { team, role, ...(assignment && { expenseRole: assignment }) },
           revision: next.revision,
         }),
       ],

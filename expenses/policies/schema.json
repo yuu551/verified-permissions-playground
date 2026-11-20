@@ -1,0 +1,112 @@
+{
+  "Spend": {
+    "entityTypes": {
+      "User": {
+        "shape": {
+          "type": "Record",
+          "attributes": {
+            "role": {
+              "type": "String"
+            },
+            "team": {
+              "type": "String"
+            }
+          }
+        }
+      },
+      "Report": {
+        "shape": {
+          "type": "Record",
+          "attributes": {
+            "owner": {
+              "type": "Entity",
+              "name": "User"
+            },
+            "approver": {
+              "type": "Entity",
+              "name": "User"
+            },
+            "team": {
+              "type": "String"
+            },
+            "state": {
+              "type": "String"
+            }
+          }
+        }
+      }
+    },
+    "actions": {
+      "view": {
+        "appliesTo": {
+          "principalTypes": [
+            "User"
+          ],
+          "resourceTypes": [
+            "Report"
+          ]
+        }
+      },
+      "create": {
+        "appliesTo": {
+          "principalTypes": [
+            "User"
+          ],
+          "resourceTypes": [
+            "Report"
+          ]
+        }
+      },
+      "edit": {
+        "appliesTo": {
+          "principalTypes": [
+            "User"
+          ],
+          "resourceTypes": [
+            "Report"
+          ]
+        }
+      },
+      "submit": {
+        "appliesTo": {
+          "principalTypes": [
+            "User"
+          ],
+          "resourceTypes": [
+            "Report"
+          ]
+        }
+      },
+      "approve": {
+        "appliesTo": {
+          "principalTypes": [
+            "User"
+          ],
+          "resourceTypes": [
+            "Report"
+          ]
+        }
+      },
+      "return": {
+        "appliesTo": {
+          "principalTypes": [
+            "User"
+          ],
+          "resourceTypes": [
+            "Report"
+          ]
+        }
+      },
+      "pay": {
+        "appliesTo": {
+          "principalTypes": [
+            "User"
+          ],
+          "resourceTypes": [
+            "Report"
+          ]
+        }
+      }
+    }
+  }
+}

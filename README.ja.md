@@ -1,55 +1,66 @@
-# AWS でチームの文書アクセスを管理する
+# AWS で動く経費精算アプリ
 
-[English](./README.md) · [ブラウザーで試す](https://yuu551.github.io/verified-permissions-playground/) · [運用手順書](./OPERATIONS.ja.md)
+[English](README.md) · [ブラウザーで試す](https://yuu551.github.io/verified-permissions-playground/) · [運用手順](OPERATIONS.ja.md)
 
-設計チームの Alice が書いた下書きは、同じチームの Ben も公開までは読めません。経理の Chika には公開後もアクセス権がありません。Ben が経理へ異動すると、ログイン中でも次のリクエストから新しい所属が適用されます。この流れを Hono、Lambda Web Functions、Cognito、Amazon Verified Permissions、DynamoDB で実装しています。
+Alice が出張の交通費を申請すると、上長の Ben の承認待ち一覧に届きます。領収書が足りなければ Ben は理由を書いて差し戻せます。Alice が領収書を添付して再申請し、Ben が承認すると、経理の Chika が精算番号を記録できます。実際の振り込みはアプリの外で行います。
 
-![利用者は Cognito でサインインする。Hono は所属と文書の状態を読み、Verified Permissions に判定を依頼する。文書の更新と履歴の記録は同時に行い、担当者は専用 IAM ロールで所属を変更する。](./docs/team-documents.png)
+## 3人の役割を試す
 
-## まず公開前後の違いを試す
+1. ブラウザー版は Alice の「自分の申請」から始まります。右上の「日本語」で表示を切り替えます。「Q4 design workshop」を開くと差し戻し理由を読めます。自分で入力する場合は「申請を作成」から件名、利用日、支払先、費目、金額を入力してください。
+2. 保存後に領収書を添付し、「申請する」を押します。領収書は省略できます。
+3. 右上の名前を押して Ben に切り替えます。「承認待ち」で申請を開き、明細を確認して承認します。差し戻しを試す場合は理由を入力して「差し戻す」を押します。Alice に戻ると同じ申請を修正できます。
+4. Chika の「経理の精算一覧」で承認済みの申請を開きます。精算番号を入力して「精算を記録」を押すと、Alice の一覧でも「精算済み」になります。
 
-ブラウザー版で Alice を選び、「下書きを作成」から文書を保存します。発行された文書 ID をコピーして、Ben に切り替え、同じ ID を開くと 403 が返ります。Alice で公開すると Ben も読めるようになります。「権限管理」で Ben の役割を `none` にすると、同じ文書が再び 403 になります。ブラウザー版ではこのリポジトリの Cedar ファイルを WebAssembly で評価します。操作結果は再読み込みでリセットされます。
+GitHub Pages 版は端末上で Cedar ポリシーを評価します。明細と領収書はブラウザーの IndexedDB に保存し、再読み込み後も残ります。試す際は架空の領収書を使ってください。AWS 版では3人がそれぞれ Cognito にログインし、別々の端末から同じ申請を扱えます。
 
-AWS 版では一人ずつ Cognito にサインインします。画面を閉じても文書・所属・変更履歴が残ります。権限管理は担当者の端末から専用の IAM ロールを使って行います。
+## 誰が何をできるか
 
-| 操作 | 許可の条件 |
+| 操作 | 条件 |
 | --- | --- |
-| 下書きを作成する | 編集者が自分のチームに作成します。所有者と所属はサーバーが決めます。 |
-| 文書を読む | 同じチームの公開済み文書か、自分が所有する下書きを読めます。 |
-| 公開する | 作成者が今もそのチームの編集者であることが必要です。 |
-| 異動・権限剥奪 | 担当者が変更理由と現在の版を指定します。別の担当者が先に変更していれば、最新の状態を確認します。 |
+| 作成・編集・添付・申請 | 在籍中の本人が、現在のチームで作成した下書きか差し戻し分を扱う |
+| 承認・差し戻し | 同じチームの上長が承認待ちの申請を扱う。自分の申請は承認できない |
+| 精算を記録 | 経理が承認済みの申請を扱う。申請者と承認者はその申請を精算できない |
+| 閲覧 | 申請者本人、承認待ちの間は同じチームの上長、承認後は経理 |
+| 権限変更 | 管理担当者が IAM ロールを引き受け、理由と所属情報の現在の版を指定する |
 
-## 手元で動かす
+Hono はリクエストごとに所属と役割を読み、Amazon Verified Permissions に操作の可否を問い合わせます。更新時には DynamoDB のトランザクションで所属と申請の版を照合し、明細、担当者の一覧、監査履歴をまとめて書き込みます。領収書の閲覧・差し替えにも申請と同じ権限が必要です。
 
-Node.js 24.12 以降を使います。コマンドを実行し、表示されたアドレスを開いてください。
+![AWS 構成図。Cognito でログインし、Lambda Web Function が Verified Permissions に認可を問い合わせ、DynamoDB に申請と領収書、所属、監査履歴を保存します。](docs/expense-reports.png)
+
+[編集用の構成図](docs/expense-reports.drawio) · [Cedar ポリシー](expenses/policies/) · [Hono のルート](expenses/service.mjs) · [保存処理](expenses/store.mjs) · [CDK](team-documents/infra.mjs)
+
+## ローカルで起動する
+
+Node.js 24.12 以降を使います。次のコマンドが表示する URL を開いてください。
 
 ```sh
 npm ci
 npm run dev
 ```
 
-## AWS で24時間試す
+`npm test` で認可と入力の検査を実行できます。ブラウザーの操作も確認する場合は `npx playwright install chromium` の後で `npm run test:ui` を実行してください。
 
-CDK をデプロイできる AWS アカウントを用意します。初めて使うアカウントとリージョンでは `npm ci` の後、`npm run build && npx cdk bootstrap` を一度実行してください。
+## AWS に24時間の試用環境を作る
+
+CDK でデプロイでき、所属管理用ロールを引き受けられる AWS アカウントを使います。対象アカウントとリージョンで初めて CDK を使う場合は、リージョン設定後に `npm run build && npx cdk bootstrap` を実行します。
 
 ```sh
 export AWS_REGION=us-east-1 AWS_DEFAULT_REGION=us-east-1
 npm ci
 npm run trial
 npm run seed
-npm run verify:aws
+npx playwright install chromium
+npm run test:aws:ui
 ```
 
-`seed` が URL と試用アカウントのファイル名を表示します。`.team-trial/` に保存される3人は、設計の編集者 Alice、同じチームの閲覧者 Ben、経理の編集者 Chika です。初期文書の ID は `handbook`、`launch-notes`、`forecast` です。自動検証では専用の一時ユーザーと文書を使います。AWS の通常料金がかかり、24時間後に EventBridge Scheduler が試用スタックの削除を開始します。早めに終了する場合は `aws cloudformation delete-stack --stack-name VerifiedPermissionsTeamDocumentsTrial` を実行し、`stack-delete-complete` まで待ちます。CDK のブートストラップ用リソースは別に管理されます。
+`seed` は URL と、3人分のログイン情報を保存した `.team-trial/` 内のファイル名を表示します。AWS 版で役割を切り替えるときはログアウトするか、ブラウザーのプロファイルを分けてください。実機テストでは架空の交通費を申請し、差し戻しから精算まで操作します。24時間後に EventBridge Scheduler がスタックの削除を要求します。利用した AWS リソースには料金がかかります。早めに削除する手順は[運用手順](OPERATIONS.ja.md)にあります。
 
-## 継続して使う環境
+## 継続して使う場合
 
-`npm run deploy` は試用環境とは別のスタックを作ります。運用 CLI は `TEAM_OUTPUTS=cdk-team-outputs.json` を指定して実行します。スタックの削除保護、ユーザープール・ポリシーストア・テーブルの保持、DynamoDB のポイントインタイムリカバリが有効です。自分の Cognito ユーザーを登録し、担当者が所属を割り当てると、編集者が画面から最初の文書を作成できます。
+`npm run deploy` で継続用スタックを作り、権限管理 CLI には `TEAM_OUTPUTS=cdk-team-outputs.json` を指定します。Cognito に利用者を作成して所属を登録し、承認担当者と経理担当者にそれぞれ役割を付与してください。継続用スタックでは削除保護と DynamoDB のポイントインタイムリカバリが有効です。異動、権限変更、監査、復旧の手順は[運用手順](OPERATIONS.ja.md)にまとめています。
 
-- [運用手順書](./OPERATIONS.ja.md)で、配属・異動・退職、棚卸し、拒否の調査、ポリシー変更の取り消し、データ復旧を扱っています。
-- [Cedar ポリシー](./team-documents/policies/) · [Hono のルート](./team-documents/app.mjs) · [DynamoDB のトランザクション](./team-documents/store.mjs) · [CDK](./team-documents/infra.mjs)
-- [構成図の編集用ファイル](./docs/team-documents.drawio) · [従来の API Gateway・Hono・FastAPI 比較サンプル](./examples/policy-playground/README.ja.md)
+このサンプルは日本円、1人1所属、1申請につき領収書1点（1.5 MiB 以下）に対応します。社内で使う際には社内認証と MFA、障害通知先、領収書の保管期間とファイル検査、振込実績との照合方法を決めてください。
 
-このサンプルは単一リージョンで、利用者は1つのチームに所属します。ID トークンはブラウザーのメモリに保持し、期限切れ時には再ログインします。社内データを扱う前には、組織の IdP・MFA、アラーム通知先、担当者ロールを引き受けられる人を設定し、想定負荷と復旧時間を確認してください。
+所属変更が文書の閲覧に反映される例は[チーム文書サンプル](https://yuu551.github.io/verified-permissions-playground/documents/)で試せます。[API Gateway の構成例](examples/policy-playground/README.md)には Hono 版と FastAPI 版があります。
 
-[Apache License 2.0](./LICENSE)
+[Apache License 2.0](LICENSE)
