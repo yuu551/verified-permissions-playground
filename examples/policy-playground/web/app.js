@@ -1,7 +1,7 @@
 'use strict'
 const $ = (id) => document.getElementById(id)
 const local = config.mode === 'browser' || config.mode === 'local'
-const repo = 'https://github.com/yuu551/verified-permissions-playground/blob/main/'
+const repo = 'https://github.com/yuu551/verified-permissions-playground/blob/main/examples/policy-playground/'
 const labels = {
   en: {
     title: 'Policy playground',

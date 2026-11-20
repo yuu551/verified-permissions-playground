@@ -1,0 +1,144 @@
+<?xml version='1.0' encoding='utf-8'?>
+<mxfile host="app.diagrams.net">
+  <diagram id="workspace" name="Team document access">
+    <mxGraphModel grid="1" page="1" pageWidth="1230" pageHeight="580" background="#ffffff">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="title" value="Document access and membership changes" style="text;strokeColor=none;fillColor=#ffffff;align=left;verticalAlign=middle;fontFamily=Helvetica;fontSize=25;fontColor=#243942;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="12" y="6" width="950" height="27" />
+        </mxCell>
+        <mxCell id="cloud" value="AWS Cloud" style="shape=mxgraph.aws4.group;grIcon=mxgraph.aws4.group_aws_cloud;strokeColor=#82929a;fillColor=none;align=left;verticalAlign=top;spacingLeft=35;spacingTop=2;fontSize=15;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="260" y="60" width="936" height="457" />
+        </mxCell>
+        <mxCell id="reader" value="" style="shape=mxgraph.aws4.user;fillColor=#253c46;strokeColor=none;aspect=fixed;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="35" y="234" width="60" height="60" />
+        </mxCell>
+        <mxCell id="reader-text" value="Employee" style="text;strokeColor=none;fillColor=#ffffff;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=17;fontColor=#243942;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="8" y="301" width="115" height="27" />
+        </mxCell>
+        <mxCell id="operator" value="" style="shape=mxgraph.aws4.user;fillColor=#253c46;strokeColor=none;aspect=fixed;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="35" y="419" width="60" height="60" />
+        </mxCell>
+        <mxCell id="operator-text" value="Access operator" style="text;strokeColor=none;fillColor=#ffffff;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=17;fontColor=#243942;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="5" y="486" width="146" height="27" />
+        </mxCell>
+        <mxCell id="cognito" value="" style="shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.cognito;fillColor=#DD344C;strokeColor=#ffffff;aspect=fixed;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="400" y="92" width="60" height="60" />
+        </mxCell>
+        <mxCell id="cognito-text" value="Amazon Cognito" style="text;strokeColor=none;fillColor=#ffffff;align=left;verticalAlign=middle;fontFamily=Helvetica;fontSize=17;fontColor=#243942;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="472" y="104" width="194" height="27" />
+        </mxCell>
+        <mxCell id="server" value="" style="shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.lambda;fillColor=#ED7100;strokeColor=#ffffff;aspect=fixed;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="400" y="234" width="60" height="60" />
+        </mxCell>
+        <mxCell id="server-text" value="Lambda Web Function" style="text;strokeColor=none;fillColor=#ffffff;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=16;fontColor=#243942;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="347" y="298" width="167" height="27" />
+        </mxCell>
+        <mxCell id="avp" value="" style="shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.verified_permissions;fillColor=#DD344C;strokeColor=#ffffff;aspect=fixed;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="808" y="234" width="60" height="60" />
+        </mxCell>
+        <mxCell id="avp-text" value="Verified Permissions" style="text;strokeColor=none;fillColor=#ffffff;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=16;fontColor=#243942;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="741" y="298" width="195" height="27" />
+        </mxCell>
+        <mxCell id="tables" value="" style="shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.dynamodb;fillColor=#C925D1;strokeColor=#ffffff;aspect=fixed;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="400" y="419" width="60" height="60" />
+        </mxCell>
+        <mxCell id="tables-text" value="DynamoDB" style="text;strokeColor=none;fillColor=#ffffff;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=16;fontColor=#243942;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="341" y="482" width="180" height="27" />
+        </mxCell>
+        <mxCell id="trail" value="" style="shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.cloudtrail;fillColor=#E7157B;strokeColor=#ffffff;aspect=fixed;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="808" y="419" width="60" height="60" />
+        </mxCell>
+        <mxCell id="trail-text" value="CloudTrail" style="text;strokeColor=none;fillColor=#ffffff;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=16;fontColor=#243942;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="775" y="482" width="125" height="27" />
+        </mxCell>
+        <mxCell id="s3" value="" style="shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.s3;fillColor=#7AA116;strokeColor=#ffffff;aspect=fixed;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="1063" y="419" width="60" height="60" />
+        </mxCell>
+        <mxCell id="s3-text" value="S3 audit archive" style="text;strokeColor=none;fillColor=#ffffff;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=16;fontColor=#243942;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="1013" y="482" width="164" height="27" />
+        </mxCell>
+        <mxCell id="login" edge="1" parent="1" style="endArrow=block;endFill=1;strokeWidth=1.8;strokeColor=#4a646c;rounded=0;">
+          <mxGeometry as="geometry" relative="1">
+            <mxPoint as="sourcePoint" x="65" y="231" />
+            <mxPoint as="targetPoint" x="398" y="122" />
+            <Array as="points">
+              <mxPoint x="65" y="122" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="login-label" value="Sign in · ID token" style="text;strokeColor=none;fillColor=#ffffff;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=14;fontColor=#243942;fontStyle=0;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="88" y="88" width="145" height="27" />
+        </mxCell>
+        <mxCell id="token" edge="1" parent="1" style="endArrow=block;endFill=1;strokeWidth=1.8;strokeColor=#4a646c;rounded=0;">
+          <mxGeometry as="geometry" relative="1">
+            <mxPoint as="sourcePoint" x="98" y="264" />
+            <mxPoint as="targetPoint" x="398" y="264" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="token-label" value="HTTPS + ID token" style="text;strokeColor=none;fillColor=#ffffff;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=14;fontColor=#243942;fontStyle=0;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="104" y="228" width="144" height="27" />
+        </mxCell>
+        <mxCell id="policy" edge="1" parent="1" style="endArrow=block;endFill=1;strokeWidth=1.8;strokeColor=#4a646c;rounded=0;">
+          <mxGeometry as="geometry" relative="1">
+            <mxPoint as="sourcePoint" x="462" y="256" />
+            <mxPoint as="targetPoint" x="806" y="256" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="policy-label" value="Evaluate a Cedar policy" style="text;strokeColor=none;fillColor=#ffffff;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=14;fontColor=#243942;fontStyle=0;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="513" y="219" width="242" height="27" />
+        </mxCell>
+        <mxCell id="answer" edge="1" parent="1" style="endArrow=block;endFill=1;strokeWidth=1.8;strokeColor=#4a646c;rounded=0;">
+          <mxGeometry as="geometry" relative="1">
+            <mxPoint as="sourcePoint" x="806" y="278" />
+            <mxPoint as="targetPoint" x="462" y="278" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="answer-label" value="Allow or deny" style="text;strokeColor=none;fillColor=#ffffff;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=14;fontColor=#243942;fontStyle=0;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="538" y="287" width="214" height="27" />
+        </mxCell>
+        <mxCell id="snapshot" edge="1" parent="1" style="endArrow=block;endFill=1;strokeWidth=1.8;strokeColor=#4a646c;rounded=0;">
+          <mxGeometry as="geometry" relative="1">
+            <mxPoint as="sourcePoint" x="457" y="291" />
+            <mxPoint as="targetPoint" x="463" y="432" />
+            <Array as="points">
+              <mxPoint x="549" y="291" />
+              <mxPoint x="549" y="432" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="snapshot-label" value="Read state / commit with revision" style="text;strokeColor=none;fillColor=#ffffff;align=left;verticalAlign=middle;fontFamily=Helvetica;fontSize=14;fontColor=#243942;fontStyle=0;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="557" y="338" width="240" height="27" />
+        </mxCell>
+        <mxCell id="access" edge="1" parent="1" style="endArrow=block;endFill=1;strokeWidth=1.8;strokeColor=#4a646c;rounded=0;">
+          <mxGeometry as="geometry" relative="1">
+            <mxPoint as="sourcePoint" x="98" y="449" />
+            <mxPoint as="targetPoint" x="398" y="449" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="access-label" value="IAM role + CLI" style="text;strokeColor=none;fillColor=#ffffff;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=14;fontColor=#243942;fontStyle=0;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="124" y="409" width="125" height="27" />
+        </mxCell>
+        <mxCell id="events" edge="1" parent="1" style="endArrow=block;endFill=1;strokeWidth=1.8;strokeColor=#4a646c;rounded=0;">
+          <mxGeometry as="geometry" relative="1">
+            <mxPoint as="sourcePoint" x="463" y="449" />
+            <mxPoint as="targetPoint" x="806" y="449" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="events-label" value="Write data events" style="text;strokeColor=none;fillColor=#ffffff;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=14;fontColor=#243942;fontStyle=0;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="560" y="451" width="196" height="27" />
+        </mxCell>
+        <mxCell id="archive" edge="1" parent="1" style="endArrow=block;endFill=1;strokeWidth=1.8;strokeColor=#4a646c;rounded=0;">
+          <mxGeometry as="geometry" relative="1">
+            <mxPoint as="sourcePoint" x="870" y="449" />
+            <mxPoint as="targetPoint" x="1061" y="449" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="archive-label" value="Deliver logs" style="text;strokeColor=none;fillColor=#ffffff;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=14;fontColor=#243942;fontStyle=0;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="900" y="413" width="130" height="27" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

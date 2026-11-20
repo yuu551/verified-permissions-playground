@@ -15,20 +15,26 @@ jobs:
         with:
           node-version: 24
           cache: npm
-      - uses: actions/setup-python@v6
-        with:
-          python-version: '3.13'
-      - run: python -m pip install uv==0.13.6
       - run: npm ci
       - run: npm test
       - run: npx playwright install --with-deps chromium
       - run: npm run test:ui
       - run: npm run synth
-        env:
-          AWS_DEFAULT_REGION: us-east-1
-      - run: npm run web:synth
-      - run: npm run build:pages
-      - run: npm run test:pages
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.13'
+      - run: python -m pip install uv==0.13.6
+      - name: Build comparison example for its existing demo URL
+        working-directory: examples/policy-playground
+        run: |
+          npm ci
+          npm test
+          npm run test:ui
+          npm run synth
+          npm run web:synth
+          npm run build:pages
+          npm run test:pages
+      - run: mkdir -p build/pages/examples/policy-playground && cp -R examples/policy-playground/build/pages/. build/pages/examples/policy-playground/
       - uses: actions/upload-pages-artifact@v3
         if: github.ref == 'refs/heads/main'
         with:

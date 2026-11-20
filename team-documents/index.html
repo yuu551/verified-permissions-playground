@@ -1,0 +1,490 @@
+<!doctype html>
+<html lang="en">
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Document room</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      background: #f6f5f1;
+      color: #233332;
+      font:
+        16px/1.55 system-ui,
+        sans-serif;
+    }
+    header,
+    main {
+      width: min(880px, 94%);
+      margin: auto;
+    }
+    header {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      border-bottom: 1px solid #bac4bf;
+      padding: 20px 0;
+    }
+    strong {
+      margin-right: auto;
+    }
+    main {
+      padding: 40px 0;
+    }
+    article {
+      background: white;
+      border: 1px solid #c6ceca;
+      padding: clamp(16px, 4vw, 38px);
+      margin: 22px 0;
+    }
+    h1,
+    h2 {
+      font-family: Georgia, serif;
+      line-height: 1.2;
+      margin: 0 0 18px;
+    }
+    h1 {
+      font-size: clamp(32px, 6vw, 52px);
+    }
+    label {
+      display: block;
+      margin: 10px 0;
+    }
+    input,
+    button {
+      font: inherit;
+      padding: 7px 11px;
+      border: 1px solid #778b83;
+      border-radius: 3px;
+      background: white;
+      color: inherit;
+    }
+    input {
+      max-width: 100%;
+      width: 23rem;
+    }
+    button {
+      cursor: pointer;
+    }
+    button.primary {
+      background: #245645;
+      color: white;
+      border-color: #245645;
+    }
+    button:disabled {
+      opacity: 0.55;
+    }
+    #body {
+      white-space: pre-wrap;
+    }
+    #trace {
+      display: block;
+      font: 13px/1.5 monospace;
+      overflow-wrap: anywhere;
+    }
+    #status {
+      min-height: 1.5em;
+    }
+    form p {
+      margin: 12px 0;
+    }
+    .row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    aside,
+    details {
+      border-left: 3px solid #779e8e;
+      padding: 0 0 0 16px;
+      margin: 18px 0;
+    }
+    select {
+      font: inherit;
+      padding: 8px;
+      background: white;
+      color: inherit;
+      border: 1px solid #778b83;
+    }
+    small {
+      color: #43564e;
+    }
+    textarea {
+      font: inherit;
+      width: min(100%, 38rem);
+    }
+    ol {
+      padding-inline-start: 20px;
+    }
+    summary {
+      cursor: pointer;
+      font-weight: 600;
+    }
+    .row label {
+      margin: 0;
+    }
+    #panel {
+      margin-top: 30px;
+    }
+    footer {
+      padding: 22px 0;
+      border-top: 1px solid #bbc6bf;
+      margin-top: 32px;
+    }
+    a {
+      color: #205943;
+    }
+  </style>
+  <header>
+    <strong>Document room</strong><span id="identity"></span><button id="locale">日本語</button
+    ><button id="out" hidden data-t="out"></button>
+  </header>
+  <main>
+    <h1 data-t="title"></h1>
+    <aside id="preview-only" hidden>
+      <small data-t="browserNote"></small>
+      <p class="row">
+        <label
+          ><span data-t="identity"></span>
+          <select id="person">
+            <option value="alice">Alice · Design</option>
+            <option value="ben">Ben · Design</option>
+            <option value="chika">Chika · Finance</option>
+          </select></label
+        ><button id="enter" class="primary" data-t="enter"></button>
+      </p>
+    </aside>
+    <form id="login">
+      <label
+        ><span data-t="user"></span><br /><input name="username" autocomplete="username" required
+      /></label>
+      <label
+        ><span data-t="password"></span><br /><input
+          name="password"
+          type="password"
+          autocomplete="current-password"
+          required
+      /></label>
+      <button class="primary" data-t="in"></button>
+    </form>
+    <form id="open" hidden>
+      <label for="ref" data-t="reference"></label>
+      <div class="row">
+        <input
+          id="ref"
+          list="references"
+          value="handbook"
+          required
+          pattern="[a-z0-9][a-z0-9-]{0,63}"
+        /><button data-t="open"></button>
+      </div>
+      <datalist id="references">
+        <option value="handbook"></option>
+        <option value="launch-notes"></option>
+        <option value="forecast"></option></datalist
+      ><small data-t="tryRefs"></small>
+    </form>
+    <details id="compose" hidden>
+      <summary data-t="create"></summary>
+      <form id="draft">
+        <label
+          ><span data-t="docTitle"></span><br /><input
+            name="title"
+            maxlength="160"
+            required /></label
+        ><label
+          ><span data-t="docBody"></span><br /><textarea
+            name="body"
+            rows="5"
+            maxlength="6000"
+            required
+          ></textarea></label
+        ><button data-t="create"></button>
+      </form>
+    </details>
+    <p id="status" role="status"></p>
+    <code id="trace"></code>
+    <article hidden id="document">
+      <h2 id="name"></h2>
+      <p id="body"></p>
+      <p id="version"></p>
+      <button id="publish" data-t="publish"></button>
+    </article>
+    <details id="panel" hidden>
+      <summary data-t="operator"></summary>
+      <form id="change">
+        <p class="row">
+          <label
+            ><span data-t="identity"></span>
+            <select name="person">
+              <option>alice</option>
+              <option>ben</option>
+              <option>chika</option>
+            </select></label
+          >
+          <label
+            ><span data-t="team"></span>
+            <select name="team">
+              <option>design</option>
+              <option>finance</option>
+            </select></label
+          >
+          <label
+            ><span data-t="role"></span>
+            <select name="role">
+              <option>reader</option>
+              <option>editor</option>
+              <option>none</option>
+            </select></label
+          >
+        </p>
+        <label
+          ><span data-t="reason"></span><br /><input
+            name="reason"
+            maxlength="240"
+            required /></label
+        ><button data-t="save"></button>
+      </form>
+      <ol id="events"></ol>
+    </details>
+    <footer>
+      <a
+        href="https://github.com/yuu551/verified-permissions-playground/blob/main/OPERATIONS.md"
+        id="runbook"
+        data-t="runbook"
+      ></a>
+    </footer>
+  </main>
+  <script type="module">
+    const clientId = '__CLIENT_ID__'
+    const preview = clientId === 'browser-preview'
+    const sandbox = preview ? await import('./browser.js') : null
+    const el = (id) => document.getElementById(id)
+    const dictionary = {
+      en: {
+        create: 'Create a draft',
+        docTitle: 'Title',
+        docBody: 'Document text',
+        browserNote:
+          'Browser sandbox. Accounts, permissions and changes live in this tab. Reload to reset.',
+        identity: 'Account',
+        enter: 'Use this account',
+        operator: 'Access management · browser sandbox',
+        team: 'Team',
+        role: 'Role',
+        reason: 'Reason for change',
+        save: 'Apply change',
+        runbook: 'Operations runbook',
+        tryRefs: 'Sample references: handbook, launch-notes, forecast.',
+        title: 'Team documents',
+        user: 'Username',
+        password: 'Password',
+        in: 'Sign in',
+        out: 'Sign out',
+        reference: 'Document reference',
+        open: 'Open document',
+        publish: 'Publish draft',
+        published: 'Published',
+        draft: 'Draft',
+        revision: 'Revision',
+        denied: 'Access denied',
+        login: 'Sign in again',
+        signed: 'Signed in',
+        failed: 'Request failed',
+        badLogin: 'Sign-in failed',
+        changed: 'The document or your access changed. Open the document again.',
+        trace: 'Request ID',
+      },
+      ja: {
+        create: '下書きを作成',
+        docTitle: 'タイトル',
+        docBody: '本文',
+        browserNote:
+          'ブラウザー内の試用環境です。ユーザー、権限、変更履歴はこのタブにあり、再読み込みで初期状態に戻ります。',
+        identity: '利用者',
+        enter: 'この利用者で開く',
+        operator: '権限管理（ブラウザー版）',
+        team: 'チーム',
+        role: '役割',
+        reason: '変更理由',
+        save: '変更を適用',
+        runbook: '運用手順書',
+        tryRefs: 'サンプルの文書 ID は handbook、launch-notes、forecast です。',
+        title: 'チームの文書',
+        user: 'ユーザー名',
+        password: 'パスワード',
+        in: 'サインイン',
+        out: 'サインアウト',
+        reference: '文書 ID',
+        open: '文書を開く',
+        publish: '下書きを公開',
+        published: '公開済み',
+        draft: '下書き',
+        revision: '版',
+        denied: 'アクセスが拒否されました',
+        login: 'もう一度サインインしてください',
+        signed: 'サインインしました',
+        failed: 'リクエストに失敗しました',
+        badLogin: 'サインインに失敗しました',
+        changed: '文書または権限が変わりました。もう一度開いてください。',
+        trace: 'リクエスト ID',
+      },
+    }
+    let lang = localStorage.getItem('team-language') === 'ja' ? 'ja' : 'en',
+      token = '',
+      username = '',
+      doc,
+      requestId = '',
+      message = '',
+      status = '',
+      sequence = 0
+    function render() {
+      const t = dictionary[lang]
+      document.documentElement.lang = lang
+      for (const e of document.querySelectorAll('[data-t]')) e.textContent = t[e.dataset.t]
+      el('locale').textContent = lang === 'en' ? '日本語' : 'English'
+      el('identity').textContent = username
+      el('login').hidden = preview || !!token
+      el('preview-only').hidden = !preview
+      el('panel').hidden = !preview
+      el('runbook').href =
+        'https://github.com/yuu551/verified-permissions-playground/blob/main/' +
+        (lang === 'ja' ? 'OPERATIONS.ja.md' : 'OPERATIONS.md')
+      el('compose').hidden = el('open').hidden = el('out').hidden = !token
+      el('status').textContent = [status, t[message]].filter(Boolean).join(' · ')
+      el('trace').textContent = requestId ? t.trace + ' ' + requestId : ''
+      el('document').hidden = !doc
+      el('name').textContent = doc?.title ?? ''
+      el('body').textContent = doc?.body ?? ''
+      el('version').textContent = doc
+        ? (doc.published ? t.published : t.draft) + ' · ' + t.revision + ' ' + doc.revision
+        : ''
+      el('publish').hidden = !doc || doc.published
+    }
+    function clear() {
+      ++sequence
+      doc = null
+      requestId = message = status = ''
+      render()
+    }
+    el('locale').onclick = () => {
+      lang = lang === 'en' ? 'ja' : 'en'
+      localStorage.setItem('team-language', lang)
+      render()
+    }
+    el('out').onclick = () => {
+      token = username = ''
+      el('draft').reset()
+      el('compose').open = false
+      clear()
+    }
+    el('ref').oninput = clear
+    el('enter').onclick = () => {
+      username = el('person').value
+      token = 'sandbox'
+      clear()
+      message = 'signed'
+      render()
+    }
+    el('change').onsubmit = (e) => {
+      e.preventDefault()
+      const { person, team, role, reason } = e.currentTarget.elements
+      sandbox.assign(person.value, team.value, role.value, reason.value)
+      const row = document.createElement('li')
+      row.textContent =
+        person.value + ' → ' + team.value + ' / ' + role.value + ' · ' + reason.value
+      el('events').prepend(row)
+      reason.value = ''
+      clear()
+    }
+    el('login').onsubmit = async (e) => {
+      e.preventDefault()
+      const form = e.currentTarget,
+        button = form.querySelector('button')
+      button.disabled = true
+      const account = form.elements.username.value
+      try {
+        const res = await fetch('https://cognito-idp.__REGION__.amazonaws.com/', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-amz-json-1.1',
+            'X-Amz-Target': 'AWSCognitoIdentityProviderService.InitiateAuth',
+          },
+          body: JSON.stringify({
+            AuthFlow: 'USER_PASSWORD_AUTH',
+            ClientId: clientId,
+            AuthParameters: { USERNAME: account, PASSWORD: form.elements.password.value },
+          }),
+        })
+        const result = await res.json()
+        if (!res.ok || !result.AuthenticationResult?.IdToken) throw Error()
+        token = result.AuthenticationResult.IdToken
+        username = account
+        message = 'signed'
+        form.reset()
+      } catch {
+        message = 'badLogin'
+      } finally {
+        button.disabled = false
+        render()
+      }
+    }
+    async function send(method, draft) {
+      const current = doc,
+        id = method === 'POST' && !draft ? current.id : el('ref').value
+      clear()
+      const ticket = sequence,
+        headers = { Authorization: 'Bearer ' + token }
+      if (draft) headers['Content-Type'] = 'application/json'
+      if (method === 'POST' && !draft) headers['If-Match'] = '"' + current.revision + '"'
+      try {
+        const path = draft ? '/api/documents' : '/api/documents/' + encodeURIComponent(id),
+          init = {
+            method,
+            headers,
+            cache: 'no-store',
+            ...(draft && { body: JSON.stringify(draft) }),
+          }
+        const res = preview ? await sandbox.request(path, username, init) : await fetch(path, init)
+        const data = await res.json()
+        if (ticket !== sequence) return
+        requestId = res.headers.get('X-Request-Id')
+        status = 'HTTP ' + res.status
+        if (res.ok) {
+          doc = method === 'POST' && !draft ? { ...current, ...data } : data
+          if (draft) {
+            el('ref').value = doc.id
+            el('draft').reset()
+            el('compose').open = false
+          }
+        } else if (res.status === 401) {
+          token = username = ''
+          message = 'login'
+        } else
+          message =
+            res.status === 403 ? 'denied' : [409, 412].includes(res.status) ? 'changed' : 'failed'
+      } catch {
+        if (ticket === sequence) message = 'failed'
+      }
+      render()
+    }
+    el('open').onsubmit = (e) => {
+      e.preventDefault()
+      send('GET')
+    }
+    el('draft').onsubmit = async (e) => {
+      e.preventDefault()
+      const b = e.currentTarget.querySelector('button')
+      b.disabled = true
+      try {
+        await send('POST', Object.fromEntries(new FormData(e.currentTarget)))
+      } finally {
+        b.disabled = false
+      }
+    }
+    el('publish').onclick = () => send('POST')
+    render()
+  </script>
+</html>

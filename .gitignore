@@ -7,3 +7,5 @@ cdk-outputs.json
 cdk-web-outputs.json
 .env
 test-results/
+.team-trial/
+cdk-team-outputs.json

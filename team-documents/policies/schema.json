@@ -1,0 +1,56 @@
+{
+  "Work": {
+    "entityTypes": {
+      "User": {
+        "shape": {
+          "type": "Record",
+          "attributes": {
+            "team": {
+              "type": "String"
+            },
+            "role": {
+              "type": "String"
+            }
+          }
+        }
+      },
+      "Document": {
+        "shape": {
+          "type": "Record",
+          "attributes": {
+            "team": {
+              "type": "String"
+            },
+            "published": {
+              "type": "Boolean"
+            },
+            "owner": {
+              "type": "Entity",
+              "name": "User"
+            }
+          }
+        }
+      }
+    },
+    "actions": {
+      "read": {
+        "appliesTo": {
+          "principalTypes": ["User"],
+          "resourceTypes": ["Document"]
+        }
+      },
+      "publish": {
+        "appliesTo": {
+          "principalTypes": ["User"],
+          "resourceTypes": ["Document"]
+        }
+      },
+      "create": {
+        "appliesTo": {
+          "principalTypes": ["User"],
+          "resourceTypes": ["Document"]
+        }
+      }
+    }
+  }
+}

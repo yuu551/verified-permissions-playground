@@ -1,33 +1,20 @@
 import { defineConfig } from '@playwright/test'
-import { readDeployment } from './scripts/deployment.mjs'
-
-const outputs = process.env.PLAYGROUND_AWS_OUTPUTS
-const hosted = process.env.PLAYGROUND_PREVIEW_URL
-const pages = process.env.PLAYGROUND_PAGES_TEST === '1'
-const localURL = pages ? 'http://127.0.0.1:4174/' : 'http://127.0.0.1:4173/'
-const baseURL = outputs
-  ? readDeployment(outputs).PlaygroundUrl
-  : hosted || localURL
-
+const live = process.env.TEAM_LIVE === '1'
+const hosted = process.env.TEAM_PREVIEW_URL
 export default defineConfig({
-  testDir: 'test',
-  testMatch: 'ui.spec.mjs',
+  testDir: 'team-documents/test',
+  testMatch: live ? 'live.spec.mjs' : 'browser.spec.mjs',
   workers: 1,
-  timeout: 60000,
   use: {
-    baseURL,
+    baseURL: hosted ?? 'http://127.0.0.1:4173/',
     launchOptions: { executablePath: process.env.CHROMIUM_PATH || undefined },
-    screenshot: 'off',
-    trace: 'off',
   },
   webServer:
-    outputs || hosted
+    live || hosted
       ? undefined
       : {
-          command: pages
-            ? 'python3 -m http.server 4174 --directory build/pages --bind 127.0.0.1'
-            : 'npm run dev',
-          url: localURL,
+          command: 'npm run dev',
+          url: 'http://127.0.0.1:4173/',
           reuseExistingServer: !process.env.CI,
         },
 })

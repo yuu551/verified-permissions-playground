@@ -1,0 +1,43 @@
+{
+  "name": "verified-permissions-playground",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=24.12.0"
+  },
+  "scripts": {
+    "dev": "node scripts/dev.mjs",
+    "test": "node --test test/*.test.mjs",
+    "build": "node scripts/build.mjs",
+    "synth": "npm run build && cdk synth --quiet",
+    "deploy": "npm run build && cdk deploy --outputs-file cdk-outputs.json",
+    "demo:user": "node scripts/user.mjs",
+    "destroy": "cdk destroy",
+    "test:ui": "playwright test",
+    "test:aws": "PLAYGROUND_AWS_OUTPUTS=cdk-outputs.json playwright test",
+    "build:pages": "node scripts/pages.mjs",
+    "test:pages": "PLAYGROUND_PAGES_TEST=1 playwright test",
+    "web:build": "node scripts/build-web-function.mjs",
+    "web:synth": "npm run web:build && cdk synth --app \"node infra/web-function.mjs\" --quiet",
+    "web:deploy": "npm run web:build && cdk deploy --app \"node infra/web-function.mjs\" --outputs-file cdk-web-outputs.json",
+    "web:user": "node scripts/user.mjs cdk-web-outputs.json",
+    "web:test": "PLAYGROUND_AWS_OUTPUTS=cdk-web-outputs.json playwright test",
+    "web:destroy": "cdk destroy --app \"node infra/web-function.mjs\""
+  },
+  "dependencies": {
+    "@aws-sdk/client-cognito-identity-provider": "^3.1172.0",
+    "@hono/node-server": "^1.19.19",
+    "@verifiedpermissions/authorization-clients-js": "^0.2.0",
+    "aws-cdk-lib": "^2.277.0",
+    "aws-jwt-verify": "^5.2.1",
+    "constructs": "^10.0.0",
+    "hono": "^4.13.19",
+    "hono-verified-permissions": "0.1.0"
+  },
+  "devDependencies": {
+    "@cedar-policy/cedar-wasm": "^4.15.0",
+    "@playwright/test": "^1.65.1",
+    "aws-cdk": "^2.1100.0",
+    "esbuild": "^0.28.0"
+  }
+}
