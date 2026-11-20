@@ -27,6 +27,8 @@ npm run access -- history USERNAME
 npm run access -- document-history DOCUMENT_ID
 ```
 
+The roster includes a stable key such as `USER#<sub>`. Pass that exact key to `show` or `history` even after the Cognito account has been deleted. It can also revoke an existing assignment. New grants require a current Cognito username.
+
 Use the revision returned by `show`. A stale write fails. Read the record again, check whether the request still applies and submit the new revision. To undo an assignment, make another reasoned change at the current revision. Do not erase the previous change. The roster index is eventually consistent, whereas `show` is strongly consistent. The next document request reads the current membership and document together. A publication also checks the membership revision at commit. Revocation prevents subsequent reads and writes; it cannot retract text already delivered. For departures, revoke the assignment first, then disable the Cognito account and end its sessions through your identity administrator.
 
 ## Investigate a denial or outage

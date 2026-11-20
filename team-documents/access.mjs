@@ -20,7 +20,10 @@ export async function operator(deployment) {
   })
   const db = dataClient({ region, credentials })
   const cognito = new CognitoIdentityProviderClient({ region, credentials })
+  const storedSubject = /^USER#([0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12})$/i
   const subject = async (username) => {
+    const stored = storedSubject.exec(username)
+    if (stored) return stored[1]
     const result = await cognito.send(
       new AdminGetUserCommand({ UserPoolId: deployment.Pool, Username: username }),
     )
@@ -34,6 +37,8 @@ export async function operator(deployment) {
       return (await membership(db, deployment, await subject(username))) ?? { revision: 0 }
     },
     async set(username, team, role, expected, reason) {
+      if (storedSubject.test(username) && (role !== 'none' || expected === 0))
+        throw new Error('Use a current Cognito username for a grant. A stored ID can revoke an existing assignment.')
       return setMembership(
         db,
         deployment,
