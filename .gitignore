@@ -4,5 +4,6 @@ __pycache__/
 build/
 cdk.out/
 cdk-outputs.json
+cdk-web-outputs.json
 .env
 test-results/

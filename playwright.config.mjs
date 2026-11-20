@@ -1,12 +1,12 @@
 import { defineConfig } from '@playwright/test'
-import { readFileSync } from 'node:fs'
+import { readDeployment } from './scripts/deployment.mjs'
 
 const outputs = process.env.PLAYGROUND_AWS_OUTPUTS
 const hosted = process.env.PLAYGROUND_PREVIEW_URL
 const pages = process.env.PLAYGROUND_PAGES_TEST === '1'
 const localURL = pages ? 'http://127.0.0.1:4174/' : 'http://127.0.0.1:4173/'
 const baseURL = outputs
-  ? JSON.parse(readFileSync(outputs, 'utf8')).VerifiedPermissionsPlayground.PlaygroundUrl
+  ? readDeployment(outputs).PlaygroundUrl
   : hosted || localURL
 
 export default defineConfig({

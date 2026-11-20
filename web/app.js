@@ -1,6 +1,6 @@
 'use strict'
 const $ = (id) => document.getElementById(id)
-const local = config.mode !== 'aws'
+const local = config.mode === 'browser' || config.mode === 'local'
 const repo = 'https://github.com/yuu551/verified-permissions-playground/blob/main/'
 const labels = {
   en: {
@@ -23,11 +23,14 @@ const labels = {
     username: 'Username',
     password: 'Password',
     accountHelp: 'Use the reader created with npm run demo:user.',
+    webAccountHelp: 'Use the reader created with npm run web:user.',
     browser: 'In browser',
-    preview: 'Local server',
+    local: 'Local server',
     aws: 'AWS REST API',
     browserNote: 'Hono and Cedar run in this browser. The CDK example also includes FastAPI.',
     localNote: 'Hono and Cedar run on the local server. The CDK example also includes FastAPI.',
+    webFunction: 'Lambda Web Function',
+    webFunctionNote: 'The Hono server verifies your Cognito ID token and asks Verified Permissions for a decision.',
     awsNote: 'API Gateway checks the Cognito ID token. Both backends use the same policy store.',
     reader: 'Demo reader',
     guest: 'Anonymous',
@@ -65,13 +68,16 @@ const labels = {
     username: 'ユーザー名',
     password: 'パスワード',
     accountHelp: 'npm run demo:user で作成したユーザーを使ってください。',
+    webAccountHelp: 'npm run web:user で作成したユーザーを使ってください。',
     browser: 'ブラウザー',
-    preview: 'ローカルサーバー',
+    local: 'ローカルサーバー',
     aws: 'AWS REST API',
     browserNote:
       'この画面ではブラウザー内で Hono と Cedar を実行します。CDK のサンプルでは FastAPI も試せます。',
     localNote:
       'Hono と Cedar はローカルサーバーで動いています。CDK のサンプルでは FastAPI も試せます。',
+    webFunction: 'Lambda Web Function',
+    webFunctionNote: 'Hono が Cognito の ID トークンを検証し、文書を閲覧できるか Verified Permissions に問い合わせます。',
     awsNote:
       'API Gateway が Cognito の ID トークンを検証します。どちらのバックエンドも同じポリシーストアを使います。',
     reader: 'デモユーザー',
@@ -168,10 +174,8 @@ function clearResult() {
 function render() {
   document.documentElement.lang = language
   for (const el of document.querySelectorAll('[data-i]')) el.textContent = t(el.dataset.i)
-  $('mode').textContent = t(config.mode === 'browser' ? 'browser' : local ? 'preview' : 'aws')
-  $('policy-note').textContent = t(
-    config.mode === 'browser' ? 'browserNote' : local ? 'localNote' : 'awsNote',
-  )
+  $('mode').textContent = t(config.mode)
+  $('policy-note').textContent = t(config.mode + 'Note')
   $('language').textContent = language === 'en' ? '日本語' : 'English'
   const identity = $('identity').value || 'reader'
   $('identity').replaceChildren(
@@ -179,15 +183,19 @@ function render() {
     new Option(t('guest'), 'guest'),
   )
   $('identity').value = identity
-  $('backend').disabled = local
+  $('backend').disabled = config.mode !== 'aws'
   $('account').hidden = local
   $('login').textContent = t(token ? 'signout' : 'signin')
   $('account-status').textContent = reader
   showPolicy(policy)
   renderResult()
 }
+if (config.mode === 'webFunction') {
+  document.querySelector('[data-i=accountHelp]').dataset.i = 'webAccountHelp'
+  document.querySelector('[data-i=deploy]').hash = 'deploy-hono-on-lambda-web-functions'
+}
 $('backend').add(new Option(local ? 'Hono · Cedar' : 'Hono', 'hono'))
-if (!local) $('backend').add(new Option('FastAPI', 'fastapi'))
+if (config.mode === 'aws') $('backend').add(new Option('FastAPI', 'fastapi'))
 $('language').onclick = () => {
   language = language === 'en' ? 'ja' : 'en'
   localStorage.setItem('avp-language', language)

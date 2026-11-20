@@ -1,5 +1,5 @@
 import { randomUUID } from 'node:crypto'
-import { readFileSync } from 'node:fs'
+import { readDeployment } from './deployment.mjs'
 import {
   CognitoIdentityProviderClient,
   AdminCreateUserCommand,
@@ -33,9 +33,7 @@ export async function createReader(outputs) {
 }
 
 if (import.meta.main) {
-  const { VerifiedPermissionsPlayground: outputs } = JSON.parse(
-    readFileSync('cdk-outputs.json', 'utf8'),
-  )
+  const outputs = readDeployment(process.argv[2] ?? 'cdk-outputs.json')
   const reader = await createReader(outputs)
   console.log(
     'Open',

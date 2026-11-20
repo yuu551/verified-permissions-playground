@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test'
-import { readFileSync } from 'node:fs'
+import { readDeployment } from '../scripts/deployment.mjs'
 import {
   AdminDeleteUserCommand,
   CognitoIdentityProviderClient,
@@ -7,7 +7,7 @@ import {
 import { createReader } from '../scripts/user.mjs'
 
 const cloud = process.env.PLAYGROUND_AWS_OUTPUTS
-const outputs = cloud && JSON.parse(readFileSync(cloud, 'utf8')).VerifiedPermissionsPlayground
+const outputs = cloud && readDeployment(cloud)
 let reader
 test.beforeAll(async () => {
   if (cloud) reader = await createReader(outputs)
@@ -26,6 +26,11 @@ test.afterAll(async () => {
 
 test('reader, anonymous, explicit forbid and default deny', async ({ page }) => {
   await page.goto('./')
+  if (outputs?.backends.length === 1) {
+    await expect(page.locator('#mode')).toHaveText('Lambda Web Function')
+    await expect(page.locator('#backend option')).toHaveText(['Hono'])
+    await expect(page.locator('a[data-i=deploy]')).toHaveAttribute('href', /#deploy-hono-on-lambda-web-functions$/)
+  }
   if (!cloud) {
     await expect(page.locator('#status-code')).toHaveText('HTTP 200')
     await expect(page.locator('#endpoint')).toHaveText('/hono/documents/guide')
@@ -38,8 +43,9 @@ test('reader, anonymous, explicit forbid and default deny', async ({ page }) => 
     await page.getByRole('dialog').getByRole('button', { name: 'Sign in', exact: true }).click()
     await expect(page.getByRole('dialog')).not.toBeVisible()
   }
-  for (const backend of cloud ? ['hono', 'fastapi'] : ['hono']) {
-    if (cloud) await page.getByLabel('Backend', { exact: true }).selectOption(backend)
+  for (const backend of outputs?.backends ?? ['hono']) {
+    if (outputs?.backends.length > 1)
+      await page.getByLabel('Backend', { exact: true }).selectOption(backend)
     for (const [id, status] of [
       ['guide', 200],
       ['release', 403],

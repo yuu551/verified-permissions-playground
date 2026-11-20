@@ -2,7 +2,7 @@
 
 English · [日本語](./README.ja.md) · [Open the playground](https://yuu551.github.io/verified-permissions-playground/)
 
-Try a document request, inspect the HTTP response, and read the Cedar policies that explain it. The hosted demo runs Hono and the Cedar WebAssembly engine in your browser. Deploy the same policies to AWS to compare Hono and FastAPI against Amazon Verified Permissions.
+Try a document request, inspect the HTTP response, and read the Cedar policies that explain it. The hosted demo runs Hono and the Cedar WebAssembly engine in your browser. On AWS, try Hono on Lambda Web Functions or compare Hono and FastAPI behind API Gateway. Both deployments use Amazon Verified Permissions.
 
 [![The document inspector showing the team guide request, its HTTP 200 response and the Cedar source](./docs/playground.png)](https://yuu551.github.io/verified-permissions-playground/)
 
@@ -31,6 +31,34 @@ npm run dev
 
 Open [localhost:4173](http://127.0.0.1:4173/). Edit the files under `policies/` and restart the server to try your own rules. The local preview uses the Hono library and the same Cedar source as the cloud deployment. No AWS account is required for this step.
 
+## Deploy Hono on Lambda Web Functions
+
+The Web Function serves the playground and its Hono routes over one HTTPS endpoint. Sign in with Cognito to get an ID token. Hono verifies the token's signature, user pool, app client, expiration and token use. The document route then sends the token, action and document ID to Amazon Verified Permissions. [HTTP server](./api/hono/web-function.mjs) · [CDK stack](./infra/web-function.mjs)
+
+![A browser signs in with Cognito and sends an ID token to Hono on a Lambda Web Function. Verified Permissions decides whether the reader can open the document.](./docs/web-function.png)
+
+After `npm ci`, select a supported AWS Region. Bootstrap CDK once per account and Region if needed.
+
+```sh
+export AWS_REGION=us-east-1 AWS_DEFAULT_REGION=us-east-1
+# First CDK deployment in this account and Region
+npm run web:build
+npx cdk bootstrap --app "node infra/web-function.mjs"
+
+npm run web:deploy
+npm run web:user
+```
+
+Open the URL printed by `npm run web:user` and sign in with the generated reader. Try the team guide, release draft and personal notes, then select **Anonymous**. To repeat those checks with a temporary user and remove the billable sample stack afterward, run these commands.
+
+```sh
+npx playwright install chromium
+npm run web:test
+npm run web:destroy
+```
+
+This stack uses Node.js 24. To compare Hono with FastAPI, use the REST API stack below. [Editable diagram](./docs/web-function.drawio) · [AWS Lambda Web Functions](https://docs.aws.amazon.com/lambda/latest/dg/web-functions.html)
+
 ## Deploy with AWS CDK
 
 Use an AWS account where you can deploy CDK resources, AWS credentials, and [uv](https://docs.astral.sh/uv/getting-started/installation/) for packaging the Python 3.13 Lambda. Start in the cloned repository after `npm ci`. The commands below target `us-east-1`.
@@ -57,7 +85,7 @@ We deployed this stack in `us-east-1` and verified all four cases in a browser a
 
 | Source | What to look for |
 | --- | --- |
-| [Hono route](./api/hono/documents.mjs) · [Lambda setup](./api/hono/handler.mjs) | The middleware maps the path parameter to a document and passes the ID token to the AWS engine. |
+| [Hono route](./api/hono/documents.mjs) · [AWS authorization engine](./api/hono/cloud.mjs) | The middleware maps the path parameter to a document and passes the ID token to the AWS engine. |
 | [FastAPI route](./api/fastapi/handler.py) | The same action and resource appear in a FastAPI dependency using `token="identityToken"`. |
 | [Permit](./policies/published.cedar) · [Forbid](./policies/embargo.cedar) | Both statements apply to the release draft. The forbid wins. |
 | [CDK stack](./infra/app.mjs) | Follow the two protected methods, issuer and audience, policy store and Lambda permissions. |
